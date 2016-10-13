@@ -1,0 +1,19 @@
+Setting up the raspberry pi to display the home screen
+------------------------------------------------------
+
+Make sure software is up-to-date:
+  sudo apt-get update
+  sudo apt-get upgrade
+  sudo apt-get dist-upgrade
+
+Install apache server:
+  sudo apt-get install apache2
+
+Clone this git project to your home directory
+
+In the file /etc/apache2/sites-available/default.conf, change "DocumentRoot /var/www/html" to "DocumentRoot /home/USERNAME/home_screen"
+
+Restart apache
+  sudo apachectl restart
+
+Point the pi's web browser to localhost (other pis or computers can point to 192.168.2.xx; the address of this pi)
