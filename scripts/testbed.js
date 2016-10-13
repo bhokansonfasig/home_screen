@@ -11,7 +11,7 @@
 
 
 var tile1 = document.getElementById("tile1")
-tile1.innerHTML = "<p> Date & Time Tile </p>"
+tile1.innerHTML = tiles.datetime.html
 
 var tile2 = document.getElementById("tile2")
 tile2.innerHTML = "<p> Weather Tile </p>"

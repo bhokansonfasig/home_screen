@@ -1,14 +1,14 @@
 html, body { width: 100%;
              height: 100% }
-div { position: fixed;
+div.tile { position: fixed;
       border: 3px solid #AAA;
       -webkit-box-sixing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box; }
 #tile1 { top: 0;
          left: 0;
-         width: 25%;
-         height: 33%;
+         width: 10%;
+         height: 10%;
          background-color: #FAA;
          text-align: center }
 #tile2 { top: 0;
