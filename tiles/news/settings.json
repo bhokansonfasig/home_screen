@@ -1,0 +1,7 @@
+enabled = 'true'
+
+size = '{"width":"600px", "height":"600px", "force_ratio":false}'
+
+region = '"C"'
+
+color = '"#FAF"'

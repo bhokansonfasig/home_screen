@@ -1,0 +1,7 @@
+enabled = 'true'
+
+size = '{"width":"600px", "height":"100px", "force_ratio":false}'
+
+region = '"SW"'
+
+color = '"#ABC"'

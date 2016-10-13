@@ -1,0 +1,7 @@
+enabled = 'true'
+
+size = '{"width":"400px", "height":"600px", "force_ratio":false}'
+
+region = '"E"'
+
+color = '"#FFA"'
