@@ -1,0 +1,31 @@
+html, body { width: 100%;
+             height: 100% }
+div { position: fixed;
+      border: 5px solid #AAA;
+      -webkit-box-sixing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box; }
+#tile1 { top: 0;
+         left: 0;
+         width: 50%;
+         height: 50%;
+         background-color: #AFA;
+         text-align: center }
+#tile2 { top: 0;
+         left: 50%;
+         width: 50%;
+         height: 50%;
+         background-color: #FAA;
+         text-align: center }
+#tile3 { top: 50%;
+         left: 0;
+         width: 50%;
+         height: 50%;
+         background-color: #FFA;
+         text-align: center }
+#tile4 { top: 50%;
+         left: 50%;
+         width: 50%;
+         height: 50%;
+         background-color: #AFF;
+         text-align: center }
