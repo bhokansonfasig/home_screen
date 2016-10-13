@@ -1,31 +1,49 @@
 html, body { width: 100%;
              height: 100% }
 div { position: fixed;
-      border: 5px solid #AAA;
+      border: 3px solid #AAA;
       -webkit-box-sixing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box; }
 #tile1 { top: 0;
          left: 0;
-         width: 50%;
-         height: 50%;
-         background-color: #AFA;
-         text-align: center }
-#tile2 { top: 0;
-         left: 50%;
-         width: 50%;
-         height: 50%;
+         width: 25%;
+         height: 33%;
          background-color: #FAA;
          text-align: center }
-#tile3 { top: 50%;
-         left: 0;
+#tile2 { top: 0;
+         left: 25%;
          width: 50%;
+         height: 33%;
+         background-color: #AFA;
+         text-align: center }
+#tile3 { top: 0;
+         left: 75%;
+         width: 25%;
+         height: 33%;
+         background-color: #AAF;
+         text-align: center }
+#tile4 { top: 33%;
+         left: 0%;
+         width: 33%;
          height: 50%;
          background-color: #FFA;
          text-align: center }
-#tile4 { top: 50%;
-         left: 50%;
-         width: 50%;
-         height: 50%;
-         background-color: #AFF;
+#tile5 { top: 33%;
+        left: 33%;
+        width: 33%;
+        height: 50%;
+        background-color: #AFF;
+        text-align: center }
+#tile6 { top: 33%;
+         left: 66%;
+         width: 34%;
+         height: 67%;
+         background-color: #FAF;
          text-align: center }
+#tile7 { top: 83%;
+        left: 0%;
+        width: 66%;
+        height: 17%;
+        background-color: #FFF;
+        text-align: center }
