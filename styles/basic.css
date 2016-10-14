@@ -1,5 +1,6 @@
 html, body { width: 100%;
-             height: 100% }
+             height: 100%;
+             background-color: #AAA}
 div.tile { position: fixed;
       border: 3px solid #AAA;
       -webkit-box-sixing: border-box;
