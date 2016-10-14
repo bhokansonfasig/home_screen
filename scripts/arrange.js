@@ -38,14 +38,18 @@ function grow(tile,fraction,direction="wh",oversize=false) {
   // Can optionally only expand in one direction
   // By default will not grow tile to larger than its preferred size
   if (direction.includes("w")) {
+    tile.left -= tile.settings.size.width*fraction/2
     tile.width += tile.settings.size.width*fraction
     if (tile.width>tile.settings.size.width && !oversize) {
+      tile.left += tile.settings.size.width*fraction/2
       tile.width -= tile.settings.size.width*fraction
     }
   }
   if (direction.includes("h")) {
+    tile.top -= tile.settings.size.height*fraction/2
     tile.height += tile.settings.size.height*fraction
     if (tile.height>tile.settings.size.height && !oversize) {
+      tile.top += tile.settings.size.height*fraction/2
       tile.height -= tile.settings.size.height*fraction
     }
   }
