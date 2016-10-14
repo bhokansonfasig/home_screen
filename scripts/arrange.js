@@ -98,9 +98,11 @@ function arrange(tile_objs) {
                  [[],[],[]],
                  [[],[],[]]]
 
+  console.log(tile_objs.length)
   // Set an anchor region for each tile
   for (var tile_i = 0; tile_i < tile_objs.length; tile_i++) {
     var tile = tile_objs[tile_i]
+    console.log(tile.settings)
     for (var i = 0; i < 3; i++) {
       for (var j = 0; j < 3; j++) {
         if (tile.settings.region===regions[i][j]) {
@@ -125,47 +127,79 @@ function arrange(tile_objs) {
     }
   }
 
+
+  // Catch empty list of arranged tiles to avoid infinite loop later on
+  try {
+    var tile = arranged[0]
+    var check = tile.width
+  } catch (e) {
+    console.log("Problem gathering tiles to arrange. Seek help.")
+    return
+  }
+
+
   // Grow each tile quickly, then progressively more slowly
   var fractions = [1/10,1/25,1/50,1/100,1/250,1/500]
   for (var frac_i = 0; frac_i < fractions.length; frac_i++) {
     fraction = fractions[frac_i]
     // Keep looping as long as pushing tiles apart is possible
     var pushable = true
+    var push_loops = 0
     while (pushable) {
+      push_loops++
+      if (push_loops>50) {
+        console.log("Too many push loops")
+        break
+      }
       // Keep looping as long as tiles are not overlapping
       var overlapping = false
+      var over_loops = 0
       while (!overlapping) {
+        over_loops++
+        if (over_loops>1) {
+          console.log("Too many overlap loops")
+          break
+        }
         // Grow each tile by a fraction of its size
         // Making sure they don't grow outside the window
+        var outside = false
         for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
           var tile = arranged[tile_i]
           grow(tile,fraction)
           if (check_outside(tile)) {
-            overlapping = true
+            console.log("Something outside")
+            outside = true
             for (var rewind_i = 0; rewind_i <= tile_i; rewind_i++) {
               var rewind_tile = arranged[rewind_i]
               grow(rewind_tile,-fraction)
             }
+            console.log("Breaking out of 1")
             break
           }
         }
+        if (outside) {
+          pushable = false
+          break
+        }
 
         // Make sure the tiles have not started to overlap each other
-        if (!overlapping) {
-          for (var tile1_i = 0; tile1_i < arranged.length; tile1_i++) {
-            var tile1 = arranged[tile1_i]
-            if (overlapping || !pushable) {
-              break
-            }
-            for (var tile2_i = 0; tile2_i < arranged.length; tile2_i++) {
-              var tile2 = arranged[tile2_i]
-              if (check_overlap(tile1,tile2)) {
-                if (!push_apart(tile1,tile2,fraction)) {
-                  push_apart(tile1,tile2,-fraction)
-                  pushable = false
-                  overlapping = true
-                  break
-                }
+        for (var tile1_i = 0; tile1_i < arranged.length; tile1_i++) {
+          var tile1 = arranged[tile1_i]
+          if (overlapping || !pushable) {
+            console.log("Breaking out of 2.2")
+            break
+          }
+          for (var tile2_i = 0; tile2_i < arranged.length; tile2_i++) {
+            var tile2 = arranged[tile2_i]
+            if (check_overlap(tile1,tile2)) {
+              console.log("Something overlaps")
+              if (!push_apart(tile1,tile2,fraction)) {
+                console.log("Can't push apart")
+                push_apart(tile1,tile2,-fraction)
+                pushable = false
+                overlapping = true
+                console.log("Breaking out of 2.1")
+                break
               }
             }
           }
@@ -173,6 +207,7 @@ function arrange(tile_objs) {
 
         // Shrink tiles back if necessary
         if (overlapping && !pushable) {
+          console.log("Rewinding growth")
           for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
             var tile = arranged[tile_i]
             grow(tile,-fraction)
@@ -190,19 +225,19 @@ function arrange(tile_objs) {
 function setup(id,tile_obj) {
   var tile = document.getElementById(id)
   tile.innerHTML = tile_obj.html
-  tile.style.top = tile_obj.top
-  tile.style.left = tile_obj.left
-  tile.style.width = tile_obj.width
-  tile.style.height = tile_obj.height
+  tile.style.top = tile_obj.top.toString()+"px"
+  tile.style.left = tile_obj.left.toString()+"px"
+  tile.style.width = tile_obj.width.toString()+"px"
+  tile.style.height = tile_obj.height.toString()+"px"
   tile.style.color = tile_obj.color
 }
 
 
-var enabled = {}
+var enabled = []
 for (var key in tiles) {
   // Only use enabled tiles
   if (tiles[key].settings.enabled) {
-    enabled[key] = tiles[key]
+    enabled.push(tiles[key])
   }
 }
 
@@ -210,6 +245,6 @@ arrange(enabled)
 
 for (var i = 0; i < arranged.length; i++) {
   id = "tile"+(i+1).toString()
-  console.log(tops[i])
+  console.log(arranged[i])
   setup(id,arranged[i])
 }
