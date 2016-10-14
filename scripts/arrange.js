@@ -67,7 +67,7 @@ function check_outside(tile) {
   }
 }
 
-function grow(tile,fraction,keep_ratio=true,direction="udlr",oversize=false) {
+function grow(tile,fraction,oversize=false,direction="udlr",keep_ratio=true) {
   // Increases the size of the tile by a fraction of its preferred size
   // Can optionally expand in specific directions (up,down,left,right)
   // By default respects the aspect ratio of the tile
@@ -127,34 +127,43 @@ function grow(tile,fraction,keep_ratio=true,direction="udlr",oversize=false) {
   return true
 }
 
-function push_apart(tile1,tile2,fraction,push_tile2=true) {
-  // Pushes tile1 and tile2 apart by a fraction of their preferred sizes
+function push_apart(tile1,tile2,fraction,push_both=true) {
+  // Pushes tile1 and tile2 apart by the larger fraction of their preferred sizes
   // Returns whether the push was successful (didn't cause any overlapping, etc.)
   // Can optionally only move tile 1
   var old_positions = [tile1.top,tile1.left,tile2.top,tile2.left]
 
+  var push_height = tile1.settings.size.height*fraction
+  var push_width = tile1.settings.size.width*fraction
+  if (tile2.settings.size.height*fraction>push_height) {
+    push_height = tile2.settings.size.height*fraction
+  }
+  if (tile2.settings.size.width*fraction>push_width) {
+    push_width = tile2.settings.size.width*fraction
+  }
+
   if (tile1.top<=tile2.top) {
-    tile1.top -= tile1.settings.size.height*fraction+1
-    if (push_tile2) {
-      tile2.top += tile2.settings.size.height*fraction+1
+    tile1.top -= push_height
+    if (push_both) {
+      tile2.top += push_height
     }
   }
   else {
-    tile1.top += tile1.settings.size.height*fraction+1
-    if (push_tile2) {
-      tile2.top -= tile2.settings.size.height*fraction+1
+    tile1.top += push_height
+    if (push_both) {
+      tile2.top -= push_height
     }
   }
   if (tile1.left<=tile2.left) {
-    tile1.left -= tile1.settings.size.width*fraction+1
-    if (push_tile2) {
-      tile2.left += tile2.settings.size.width*fraction+1
+    tile1.left -= push_width
+    if (push_both) {
+      tile2.left += push_width
     }
   }
   else {
-    tile1.left += tile1.settings.size.width*fraction+1
-    if (push_tile2) {
-      tile2.left -= tile2.settings.size.width*fraction+1
+    tile1.left += push_width
+    if (push_both) {
+      tile2.left -= push_width
     }
   }
 
@@ -234,7 +243,8 @@ function edge_snap(tile,proximity) {
   temp_tile.left = tile.left
   temp_tile.height = tile.top
   temp_tile.width = tile.width
-  if (edge_close(tile,temp_tile) && tile.top/window.innerHeight<proximity) {
+  var closeness = tile.top/window.innerHeight
+  if (edge_close(tile,temp_tile) && closeness<proximity) {
     tile.top = 0
   }
 
@@ -243,7 +253,8 @@ function edge_snap(tile,proximity) {
   temp_tile.left = tile.left
   temp_tile.height = window.innerHeight - temp_tile.top
   temp_tile.width = tile.width
-  if (edge_close(tile,temp_tile) && tile.top/window.innerHeight>(1-proximity)) {
+  closeness = (window.innerHeight-tile.top-tile.height)/window.innerHeight
+  if (edge_close(tile,temp_tile) && closeness<proximity) {
     tile.top = window.innerHeight - tile.height
   }
 
@@ -252,7 +263,8 @@ function edge_snap(tile,proximity) {
   temp_tile.left = 0
   temp_tile.height = tile.height
   temp_tile.width = tile.left
-  if (edge_close(tile,temp_tile) && tile.left/window.innerWidth<proximity) {
+  closeness = tile.left/window.innerWidth
+  if (edge_close(tile,temp_tile) && closeness<proximity) {
     tile.left = 0
   }
 
@@ -261,9 +273,17 @@ function edge_snap(tile,proximity) {
   temp_tile.left = tile.left+tile.width
   temp_tile.height = tile.height
   temp_tile.width = window.innerWidth - temp_tile.left
-  if (edge_close(tile,temp_tile)  && tile.left/window.innerWidth>(1-proximity)) {
+  closeness = (window.innerWidth-tile.left-tile.width)/window.innerWidth
+  if (edge_close(tile,temp_tile)  && closeness<proximity) {
     tile.left = window.innerWidth - tile.width
   }
+}
+
+function revert(tile,dimensions) {
+  tile.top = dimensions[0]
+  tile.left = dimensions[1]
+  tile.height = dimensions[2]
+  tile.width = dimensions[3]
 }
 
 
@@ -313,83 +333,88 @@ function arrange(tile_objs) {
   }
 
 
-  // Grow the tiles as much as possible, snap them to edges, then grow again
-  var max_loops = 10
-  for (var snap_i = 0; snap_i < max_loops ; snap_i++) {
-    // Grow each tile quickly, then progressively more slowly
-    var fractions = [1/100,1/250,1/500,1/1000]
-    for (var frac_i = 0; frac_i < fractions.length; frac_i++) {
-      fraction = fractions[frac_i]
-      // Keep looping as long as pushing tiles apart is possible
-      var pushable = true
-      var push_loops = 0
-      while (pushable) {
-        push_loops++
-        if (push_loops>50) {
-          console.log("Too many push loops")
-          break
-        }
-        // Keep looping as long as tiles are not overlapping
-        var overlapping = false
-        var over_loops = 0
-        while (!overlapping) {
-          over_loops++
-          if (over_loops>50) {
-            console.log("Too many overlap loops")
-            break
-          }
-          // Grow each tile by a fraction of its size
-          // Making sure they don't grow outside the window
-          var outside = false
-          for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
-            var tile = arranged[tile_i]
-            grow(tile,fraction)
-            var outside_sides = check_outside(tile)
-            if (outside_sides!==false) {
-              if (!push_in(tile,fraction,outside_sides)) {
-                push_in(tile,-fraction,outside_sides)
-                if (outside_sides.length===2) {
-                  grow(tile,-fraction,outside_sides)
-                }
-                else if (tile.settings.size.force_ratio) {
-                  grow(tile,-fraction)
-                }
-                else {
-                  grow(tile,-fraction,outside_sides)
-                }
-              }
-            }
-          }
+  // Grow the tiles as much as possible, snap them to edges, then repeat
+  var max_loops = 25
+  for (var snap_i = 1; snap_i < max_loops+1 ; snap_i++) {
+    var fraction = 1/10000
+    var current_dimensions = []
+    for (var i = 0; i < arranged.length; i++) {
+      var tile = arranged[i]
+      current_dimensions.push([tile.top,tile.left,tile.height,tile.width])
+    }
+    // Keep looping as long as tile dimensions are changing
+    var changing = true
+    var loops = 0
+    while (changing) {
+      loops++
+      if (loops>1/fraction) {
+        console.log("Too many loops")
+        break
+      }
 
-          // Make sure the tiles have not started to overlap each other
-          for (var tile1_i = 0; tile1_i < arranged.length; tile1_i++) {
-            var tile1 = arranged[tile1_i]
-            if (overlapping || !pushable) {
-              break
-            }
-            for (var tile2_i = 0; tile2_i < arranged.length; tile2_i++) {
-              var tile2 = arranged[tile2_i]
-              if (check_overlap(tile1,tile2)) {
-                if (!push_apart(tile1,tile2,fraction)) {
-                  push_apart(tile1,tile2,-fraction)
-                  if (!push_apart(tile1,tile2,fraction,push_tile2=false) &&
-                      !push_apart(tile2,tile1,fraction,push_tile2=false)) {
-                    push_apart(tile1,tile2,-fraction,push_tile2=false)
-                    push_apart(tile2,tile1,-fraction,push_tile2=false)
-                    pushable = false
-                    overlapping = true
-                    break
-                  }
-                }
-              }
-            }
-          }
+      var past_dimensions = current_dimensions
+      current_dimensions = []
 
-          // Shrink tiles back if necessary
-          if (overlapping && !pushable) {
-            for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
-              var tile = arranged[tile_i]
+      // Grow each tile by a fraction of its size
+      // Making sure they don't grow outside the window
+      var outside = false
+      for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
+        var tile = arranged[tile_i]
+        grow(tile,fraction)
+        var outside_sides = check_outside(tile)
+        if (outside_sides!==false) {
+          if (!push_in(tile,fraction,outside_sides)) {
+            push_in(tile,-fraction,outside_sides)
+            if (outside_sides.length===2) {
+              grow(tile,-fraction,outside_sides)
+            }
+            else if (tile.settings.size.force_ratio) {
               grow(tile,-fraction)
+            }
+            else {
+              grow(tile,-fraction,outside_sides)
+            }
+          }
+        }
+      }
+
+      // Make sure the tiles have not started to overlap each other
+      for (var tile1_i = 0; tile1_i < arranged.length; tile1_i++) {
+        var tile1 = arranged[tile1_i]
+        for (var tile2_i = 0; tile2_i < arranged.length; tile2_i++) {
+          var tile2 = arranged[tile2_i]
+          // If the two tiles are overlapping...
+          if (check_overlap(tile1,tile2)) {
+            // Try pushing them apart equally. If that doesn't work...
+            if (!push_apart(tile1,tile2,fraction)) {
+              push_apart(tile1,tile2,-fraction)
+              // Try pushing them apart individually. If neither of those works,
+              // revert the tiles back
+              if (!push_apart(tile1,tile2,fraction,push_both=false)) {
+                push_apart(tile1,tile2,-fraction,push_both=false)
+                if (!push_apart(tile2,tile1,fraction,push_both=false)) {
+                  push_apart(tile2,tile1,-fraction,push_both=false)
+                  revert(tile1,past_dimensions[tile1_i])
+                  revert(tile2,past_dimensions[tile2_i])
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Check whether anything has (noticably) changed
+      for (var i = 0; i < arranged.length; i++) {
+        var tile = arranged[i]
+        current_dimensions.push([tile.top,tile.left,tile.height,tile.width])
+      }
+      if (loops>100) {
+        changing = false
+        for (var i = 0; i < current_dimensions.length; i++) {
+          for (var j = 0; j < 4; j++) {
+            if (Math.round(current_dimensions[i][j]*100/fraction)!==Math.round(past_dimensions[i][j]*100/fraction)) {
+                  changing = true
+                  break
             }
           }
         }
@@ -403,8 +428,21 @@ function arrange(tile_objs) {
     }
   }
 
+  // Sort tiles by percentage of desired size
+  var grow_order = []
+  for (var i = 0; i < arranged.length; i++) {
+    area_percentage = 100*(arranged[i].width*arranged[i].height)/
+          (arranged[i].settings.size.width*arranged[i].settings.size.height)
+    grow_order.push([i,area_percentage])
+  }
+  grow_order.sort(
+    function(a,b) {
+      return a[1]-b[1]
+    }
+  )
+  console.log(grow_order)
+
   // Individually grow tiles where possible
-  // TODO
 }
 
 
