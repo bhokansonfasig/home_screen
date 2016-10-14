@@ -5,11 +5,7 @@ var arranged = []
 
 function check_overlap(tile1,tile2) {
   // Checks if tile1 and tile2 are overlapping
-  // Returns false or the corner(s) of tile1 overlapping with tile2
-  // Corners:
-  //   1------2
-  //   |      |
-  //   3------4
+  // Returns false or side(s) of tile1 overlapping with tile2
   if (tile1===tile2) {
     return false
   }
@@ -22,24 +18,23 @@ function check_overlap(tile1,tile2) {
         return false
   }
   else {
-    var corners = ""
-    if ((tile1.top<tile2.top+tile2.height) &&
-        (tile1.left<tile2.left+tile2.width)) {
-          corners += "1"
+    var sides = ""
+    if ((tile1.top>=tile2.top) && (tile1.top<=tile2.top+tile2.height)) {
+          sides += "u"
     }
-    if ((tile1.top<tile2.top+tile2.height) &&
-        (tile1.left+tile1.width>tile2.left)) {
-          corners += "2"
+    if ((tile1.top+tile1.height>=tile2.top) &&
+        (tile1.top+tile1.height<=tile2.top+tile2.height)) {
+          sides += "d"
     }
-    if ((tile1.top+tile1.height>tile2.top) &&
-        (tile1.left<tile2.left+tile2.width)) {
-          corners += "3"
+    if ((tile1.left>=tile2.left) && (tile1.left<=tile2.left+tile2.width)) {
+          sides += "l"
     }
-    if ((tile1.top+tile1.height>tile2.top) &&
-        (tile1.left+tile1.width>tile2.left)) {
-          corners += "4"
+    if ((tile1.left+tile1.width>=tile2.left) &&
+        (tile1.left+tile1.width<=tile2.left+tile2.width)) {
+          sides += "r"
     }
-    return corners
+
+    return sides
   }
 }
 
@@ -127,43 +122,53 @@ function grow(tile,fraction,oversize=false,direction="udlr",keep_ratio=true) {
   return true
 }
 
-function push_apart(tile1,tile2,fraction,push_both=true) {
+function push_apart(tile1,tile2,fraction,direction="ul",push_both=true) {
   // Pushes tile1 and tile2 apart by the larger fraction of their preferred sizes
   // Returns whether the push was successful (didn't cause any overlapping, etc.)
   // Can optionally only move tile 1
   var old_positions = [tile1.top,tile1.left,tile2.top,tile2.left]
 
+  // Push in a direction if one of its indicators is present, but not both
+  var push_vert = ((direction.includes("u") || direction.includes("d")) &&
+                  !(direction.includes("u") && direction.includes("d")))
+  var push_horiz = ((direction.includes("l") || direction.includes("r")) &&
+                   !(direction.includes("l") && direction.includes("r")))
+
   var push_height = tile1.settings.size.height*fraction
   var push_width = tile1.settings.size.width*fraction
-  if (tile2.settings.size.height*fraction>push_height) {
+  if (Math.abs(tile2.settings.size.height*fraction)>Math.abs(push_height)) {
     push_height = tile2.settings.size.height*fraction
   }
-  if (tile2.settings.size.width*fraction>push_width) {
+  if (Math.abs(tile2.settings.size.width*fraction)>Math.abs(push_width)) {
     push_width = tile2.settings.size.width*fraction
   }
 
-  if (tile1.top<=tile2.top) {
-    tile1.top -= push_height
-    if (push_both) {
-      tile2.top += push_height
+  if (push_vert) {
+    if (tile1.top<=tile2.top) {
+      tile1.top -= push_height
+      if (push_both) {
+        tile2.top += push_height
+      }
+    }
+    else {
+      tile1.top += push_height
+      if (push_both) {
+        tile2.top -= push_height
+      }
     }
   }
-  else {
-    tile1.top += push_height
-    if (push_both) {
-      tile2.top -= push_height
+  if (push_horiz) {
+    if (tile1.left<=tile2.left) {
+      tile1.left -= push_width
+      if (push_both) {
+        tile2.left += push_width
+      }
     }
-  }
-  if (tile1.left<=tile2.left) {
-    tile1.left -= push_width
-    if (push_both) {
-      tile2.left += push_width
-    }
-  }
-  else {
-    tile1.left += push_width
-    if (push_both) {
-      tile2.left -= push_width
+    else {
+      tile1.left += push_width
+      if (push_both) {
+        tile2.left -= push_width
+      }
     }
   }
 
@@ -383,17 +388,21 @@ function arrange(tile_objs) {
         var tile1 = arranged[tile1_i]
         for (var tile2_i = 0; tile2_i < arranged.length; tile2_i++) {
           var tile2 = arranged[tile2_i]
+          overlap_sides = check_overlap(tile1,tile2)
           // If the two tiles are overlapping...
-          if (check_overlap(tile1,tile2)) {
+          if (overlap_sides!==false) {
+            // Shrink them back down
+            revert(tile1,past_dimensions[tile1_i])
+            revert(tile2,past_dimensions[tile2_i])
             // Try pushing them apart equally. If that doesn't work...
-            if (!push_apart(tile1,tile2,fraction)) {
-              push_apart(tile1,tile2,-fraction)
+            if (!push_apart(tile1,tile2,fraction,overlap_sides)) {
+              push_apart(tile1,tile2,-fraction,overlap_sides)
               // Try pushing them apart individually. If neither of those works,
               // revert the tiles back
-              if (!push_apart(tile1,tile2,fraction,push_both=false)) {
-                push_apart(tile1,tile2,-fraction,push_both=false)
-                if (!push_apart(tile2,tile1,fraction,push_both=false)) {
-                  push_apart(tile2,tile1,-fraction,push_both=false)
+              if (!push_apart(tile1,tile2,fraction,overlap_sides,push_both=false)) {
+                push_apart(tile1,tile2,-fraction,overlap_sides,push_both=false)
+                if (!push_apart(tile2,tile1,fraction,overlap_sides,push_both=false)) {
+                  push_apart(tile2,tile1,-fraction,overlap_sides,push_both=false)
                   revert(tile1,past_dimensions[tile1_i])
                   revert(tile2,past_dimensions[tile2_i])
                 }
@@ -408,7 +417,8 @@ function arrange(tile_objs) {
         var tile = arranged[i]
         current_dimensions.push([tile.top,tile.left,tile.height,tile.width])
       }
-      if (loops>100) {
+      // Give it a chance to change a bit first
+      if (loops>10) {
         changing = false
         for (var i = 0; i < current_dimensions.length; i++) {
           for (var j = 0; j < 4; j++) {
@@ -431,7 +441,7 @@ function arrange(tile_objs) {
   // Sort tiles by percentage of desired size
   var grow_order = []
   for (var i = 0; i < arranged.length; i++) {
-    area_percentage = 100*(arranged[i].width*arranged[i].height)/
+    var area_percentage = 100*(arranged[i].width*arranged[i].height)/
           (arranged[i].settings.size.width*arranged[i].settings.size.height)
     grow_order.push([i,area_percentage])
   }
@@ -440,9 +450,12 @@ function arrange(tile_objs) {
       return a[1]-b[1]
     }
   )
-  console.log(grow_order)
 
-  // Individually grow tiles where possible
+  // Fill space by stretching tiles that will allow it
+  // Loop through based on percentage of preferred area achieved so far
+  for (var i = 0; i < grow_order.length; i++) {
+    var tile = arranged[grow_order[i][0]]
+  }
 }
 
 
