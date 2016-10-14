@@ -382,10 +382,10 @@ function arrange(tile_objs) {
 function setup(id,tile_obj) {
   var tile = document.getElementById(id)
   tile.innerHTML = tile_obj.html
-  tile.style.top = Math.floor(tile_obj.top).toString()+"px"
-  tile.style.left = Math.floor(tile_obj.left).toString()+"px"
-  tile.style.width = Math.floor(tile_obj.width).toString()+"px"
-  tile.style.height = Math.floor(tile_obj.height).toString()+"px"
+  tile.style.top = Math.round(tile_obj.top/window.innerHeight*100).toString()+"%"
+  tile.style.left = Math.round(tile_obj.left/window.innerWidth*100).toString()+"%"
+  tile.style.width = Math.round(tile_obj.width/window.innerWidth*100).toString()+"%"
+  tile.style.height = Math.round(tile_obj.height/window.innerHeight*100).toString()+"%"
   tile.style.backgroundColor = tile_obj.settings.color
 }
 
