@@ -1,6 +1,6 @@
 enabled = 'true'
 
-size = '{"width":"400px", "height":"600px", "force_ratio":true}'
+size = '{"width":400, "height":600, "force_ratio":true}'
 
 region = '"W"'
 
