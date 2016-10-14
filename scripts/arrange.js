@@ -62,7 +62,7 @@ function check_outside(tile) {
   }
 }
 
-function grow(tile,fraction,oversize=false,direction="udlr",keep_ratio=true) {
+function grow(tile,fraction,direction="udlr",oversize=false,keep_ratio=true) {
   // Increases the size of the tile by a fraction of its preferred size
   // Can optionally expand in specific directions (up,down,left,right)
   // By default respects the aspect ratio of the tile
@@ -292,7 +292,6 @@ function revert(tile,dimensions) {
 }
 
 
-
 function arrange(tile_objs) {
   // Sets sizes and locations of tile_objs based on their preferrences
   var regions = [["NW","N","NE"],["W","C","E"],["SW","S","SE"]]
@@ -362,7 +361,6 @@ function arrange(tile_objs) {
 
       // Grow each tile by a fraction of its size
       // Making sure they don't grow outside the window
-      var outside = false
       for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
         var tile = arranged[tile_i]
         grow(tile,fraction)
@@ -388,7 +386,7 @@ function arrange(tile_objs) {
         var tile1 = arranged[tile1_i]
         for (var tile2_i = 0; tile2_i < arranged.length; tile2_i++) {
           var tile2 = arranged[tile2_i]
-          overlap_sides = check_overlap(tile1,tile2)
+          var overlap_sides = check_overlap(tile1,tile2)
           // If the two tiles are overlapping...
           if (overlap_sides!==false) {
             // Shrink them back down
@@ -443,7 +441,9 @@ function arrange(tile_objs) {
   for (var i = 0; i < arranged.length; i++) {
     var area_percentage = 100*(arranged[i].width*arranged[i].height)/
           (arranged[i].settings.size.width*arranged[i].settings.size.height)
-    grow_order.push([i,area_percentage])
+    if (!arranged[i].settings.size.force_ratio) {
+      grow_order.push([i,area_percentage])
+    }
   }
   grow_order.sort(
     function(a,b) {
@@ -451,10 +451,53 @@ function arrange(tile_objs) {
     }
   )
 
+
   // Fill space by stretching tiles that will allow it
   // Loop through based on percentage of preferred area achieved so far
   for (var i = 0; i < grow_order.length; i++) {
     var tile = arranged[grow_order[i][0]]
+    current_dimensions = [tile.top,tile.left,tile.height,tile.width]
+
+    // Keep looping as long as tile dimensions are changing
+    var changing = true
+    var loops = 0
+    while (changing) {
+      loops++
+      if (loops>1/fraction) {
+        console.log("Too many loops")
+        break
+      }
+
+      var past_dimensions = current_dimensions
+
+      var directions = ["u","d","l","r"]
+
+      // Try to increase each dimension of the tile without overlapping
+      grow(tile,fraction,direction=directions[loops%4],oversize=true)
+      if (check_outside(tile)!==false) {
+        revert(tile,past_dimensions)
+      }
+      for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
+        var other_tile = arranged[tile_i]
+        if (check_overlap(tile,other_tile)!==false) {
+          revert(tile,past_dimensions)
+          break
+        }
+      }
+
+      // Check whether anything has (noticably) changed
+      current_dimensions = [tile.top,tile.left,tile.height,tile.width]
+      // Give it a chance to change a bit first
+      if (loops>10) {
+        changing = false
+        for (var j = 0; j < 4; j++) {
+          if (Math.round(current_dimensions[j]*100/fraction)!==Math.round(past_dimensions[j]*100/fraction)) {
+                changing = true
+                break
+          }
+        }
+      }
+    }
   }
 }
 
