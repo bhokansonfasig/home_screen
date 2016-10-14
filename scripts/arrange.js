@@ -23,10 +23,11 @@ function check_overlap(tile1,tile2) {
 
 function check_outside(tile) {
   // Checks if tile has any portion outside of the window
-  if (tile.top<0 || tile.left<0 ||
-      tile.top+tile.height>window.innerHeight ||
-      tile.left+tile.width>window.innerWidth) {
-        return true
+  if (tile.top<0 || tile.top+tile.height>window.innerHeight) {
+    return "h"
+  }
+  else if (tile.left<0 || tile.left+tile.width>window.innerWidth) {
+    return "w"
   }
   else {
     return false
@@ -122,14 +123,15 @@ function arrange(tile_objs) {
 
   // Set an anchor point for each tile to grow around
   // (separate tiles in the same region slightly)
+  var anchor_portions = [1,4,7]
   for (var i = 0; i < 3; i++) {
     for (var j = 0; j < 3; j++) {
       for (var k = 0; k < anchors[i][j].length; k++) {
         var tile = anchors[i][j][k]
         tile.width = 10
         tile.height = 10
-        tile.top = (window.innerHeight-50*anchors[i][j].length)*(i+1)/4+50*k
-        tile.left = (window.innerWidth-50*anchors[i][j].length)*(j+1)/4+50*k
+        tile.top = (window.innerHeight-50*anchors[i][j].length)*anchor_portions[i]/8+50*k
+        tile.left = (window.innerWidth-50*anchors[i][j].length)*anchor_portions[j]/8+50*k
         arranged.push(tile)
       }
     }
@@ -174,19 +176,15 @@ function arrange(tile_objs) {
         for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
           var tile = arranged[tile_i]
           grow(tile,fraction)
-          if (check_outside(tile)) {
-            console.log("Something outside")
-            outside = true
-            for (var rewind_i = 0; rewind_i <= tile_i; rewind_i++) {
-              var rewind_tile = arranged[rewind_i]
-              grow(rewind_tile,-fraction)
+          var outside_direction = check_outside(tile)
+          if (outside_direction!==false) {
+            if (tile.settings.size.force_ratio) {
+              grow(tile,-fraction)
             }
-            break
+            else {
+              grow(tile,-fraction,outside_direction)
+            }
           }
-        }
-        if (outside) {
-          pushable = false
-          break
         }
 
         // Make sure the tiles have not started to overlap each other
@@ -238,6 +236,12 @@ function setup(id,tile_obj) {
 }
 
 
+function hide(id) {
+  var tile = document.getElementById(id)
+  tile.style.visibility = "hidden"
+}
+
+
 var enabled = []
 for (var key in tiles) {
   // Only use enabled tiles
@@ -248,8 +252,12 @@ for (var key in tiles) {
 
 arrange(enabled)
 
-for (var i = 0; i < arranged.length; i++) {
+for (var i = 0; i < 10; i++) {
   id = "tile"+(i+1).toString()
-  console.log(arranged[i])
-  setup(id,arranged[i])
+  if (i<arranged.length) {
+    setup(id,arranged[i])
+  }
+  else {
+    hide(id)
+  }
 }
