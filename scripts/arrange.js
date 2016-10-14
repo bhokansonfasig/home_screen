@@ -314,11 +314,12 @@ function arrange(tile_objs) {
 
 
   // Grow the tiles as much as possible, snap them to edges, then grow again
-  for (var snap_i = 0; snap_i < 2; snap_i++) {
+  for (var snap_i = 0; snap_i < 10; snap_i++) {
     // Grow each tile quickly, then progressively more slowly
-    var fractions = [1/50,1/100,1/1000]
+    var fractions = [1/25,1/50,1/100,1/250,1/500,1/1000]
     for (var frac_i = 0; frac_i < fractions.length; frac_i++) {
       fraction = fractions[frac_i]
+      console.log(fraction)
       // Keep looping as long as pushing tiles apart is possible
       var pushable = true
       var push_loops = 0
