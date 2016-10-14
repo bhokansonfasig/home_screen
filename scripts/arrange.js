@@ -171,10 +171,10 @@ function push_apart(tile1,tile2,fraction,push_tile2=true) {
   }
   for (var i = 0; i < arranged.length; i++) {
     var tile = arranged[i]
-    if (check_overlap(tile1,tile)) {
+    if (check_overlap(tile1,tile)!==false) {
       return false
     }
-    else if (check_overlap(tile2,tile)) {
+    else if (check_overlap(tile2,tile)!==false) {
       return false
     }
   }
@@ -182,8 +182,36 @@ function push_apart(tile1,tile2,fraction,push_tile2=true) {
   return true
 }
 
+function push_in(tile,fraction,sides) {
+  // Pushes tile inward based on its outside sides
+  // Returns whether the push was successful (didn't cause any overlapping, etc.)
+  if (sides.includes("u")) {
+    tile.top += tile.settings.size.height*fraction+1
+  }
+  if (sides.includes("d")) {
+    tile.top -= tile.settings.size.height*fraction+1
+  }
+  if (sides.includes("l")) {
+    tile.left += tile.settings.size.width*fraction+1
+  }
+  if (sides.includes("r")) {
+    tile.left -= tile.settings.size.width*fraction+1
+  }
+  if (check_outside(tile)!==false) {
+    return false
+  }
+  for (var i = 0; i < arranged.length; i++) {
+    var other = arranged[i]
+    if (check_overlap(tile,other)!==false) {
+      return false
+    }
+  }
+  return true
+}
 
 function edge_close(tile,temp_tile) {
+  // Checks for overlap between temp_tile and tiles other than tile
+  // This determines whether tile can be pushed to the corresponding edge
   var blocked = false
   for (var i = 0; i < arranged.length; i++) {
     if (tile===arranged[i]) {
@@ -198,6 +226,7 @@ function edge_close(tile,temp_tile) {
 }
 
 function edge_snap(tile) {
+  // Snaps tile to the edges it is closest to
   var temp_tile = {}
 
   // Check snap to top edge
@@ -206,7 +235,6 @@ function edge_snap(tile) {
   temp_tile.height = tile.top
   temp_tile.width = tile.width
   if (edge_close(tile,temp_tile)) {
-    console.log("Snap to top")
     tile.top = 0
   }
 
@@ -216,7 +244,6 @@ function edge_snap(tile) {
   temp_tile.height = window.innerHeight - temp_tile.top
   temp_tile.width = tile.width
   if (edge_close(tile,temp_tile)) {
-    console.log("Snap to bottom")
     tile.top = window.innerHeight - tile.height
   }
 
@@ -226,7 +253,6 @@ function edge_snap(tile) {
   temp_tile.height = tile.height
   temp_tile.width = tile.left
   if (edge_close(tile,temp_tile)) {
-    console.log("Snap to left")
     tile.left = 0
   }
 
@@ -236,7 +262,6 @@ function edge_snap(tile) {
   temp_tile.height = tile.height
   temp_tile.width = window.innerWidth - temp_tile.left
   if (edge_close(tile,temp_tile)) {
-    console.log("Snap to right")
     tile.left = window.innerWidth - tile.width
   }
 }
@@ -318,13 +343,19 @@ function arrange(tile_objs) {
           for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
             var tile = arranged[tile_i]
             grow(tile,fraction)
-            var outside_direction = check_outside(tile)
-            if (outside_direction!==false) {
-              if (tile.settings.size.force_ratio) {
-                grow(tile,-fraction)
-              }
-              else {
-                grow(tile,-fraction,outside_direction)
+            var outside_sides = check_outside(tile)
+            if (outside_sides!==false) {
+              if (!push_in(tile,fraction,outside_sides)) {
+                push_in(tile,-fraction,outside_sides)
+                if (outside_sides.length===2) {
+                  grow(tile,-fraction,outside_sides)
+                }
+                else if (tile.settings.size.force_ratio) {
+                  grow(tile,-fraction)
+                }
+                else {
+                  grow(tile,-fraction,outside_sides)
+                }
               }
             }
           }
@@ -364,15 +395,11 @@ function arrange(tile_objs) {
       }
     }
 
-    console.log("Snapping")
     // Snap tiles to edges
     for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
-      console.log(tile_i)
       edge_snap(arranged[tile_i])
     }
   }
-
-
 
   // Individually grow tiles where possible
   // TODO
