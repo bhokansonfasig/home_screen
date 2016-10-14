@@ -225,7 +225,7 @@ function edge_close(tile,temp_tile) {
   return true
 }
 
-function edge_snap(tile) {
+function edge_snap(tile,proximity) {
   // Snaps tile to the edges it is closest to
   var temp_tile = {}
 
@@ -234,7 +234,7 @@ function edge_snap(tile) {
   temp_tile.left = tile.left
   temp_tile.height = tile.top
   temp_tile.width = tile.width
-  if (edge_close(tile,temp_tile)) {
+  if (edge_close(tile,temp_tile) && tile.top/window.innerHeight<proximity) {
     tile.top = 0
   }
 
@@ -243,7 +243,7 @@ function edge_snap(tile) {
   temp_tile.left = tile.left
   temp_tile.height = window.innerHeight - temp_tile.top
   temp_tile.width = tile.width
-  if (edge_close(tile,temp_tile)) {
+  if (edge_close(tile,temp_tile) && tile.top/window.innerHeight>(1-proximity)) {
     tile.top = window.innerHeight - tile.height
   }
 
@@ -252,7 +252,7 @@ function edge_snap(tile) {
   temp_tile.left = 0
   temp_tile.height = tile.height
   temp_tile.width = tile.left
-  if (edge_close(tile,temp_tile)) {
+  if (edge_close(tile,temp_tile) && tile.left/window.innerWidth<proximity) {
     tile.left = 0
   }
 
@@ -261,7 +261,7 @@ function edge_snap(tile) {
   temp_tile.left = tile.left+tile.width
   temp_tile.height = tile.height
   temp_tile.width = window.innerWidth - temp_tile.left
-  if (edge_close(tile,temp_tile)) {
+  if (edge_close(tile,temp_tile)  && tile.left/window.innerWidth>(1-proximity)) {
     tile.left = window.innerWidth - tile.width
   }
 }
@@ -314,12 +314,12 @@ function arrange(tile_objs) {
 
 
   // Grow the tiles as much as possible, snap them to edges, then grow again
-  for (var snap_i = 0; snap_i < 10; snap_i++) {
+  var max_loops = 10
+  for (var snap_i = 0; snap_i < max_loops ; snap_i++) {
     // Grow each tile quickly, then progressively more slowly
-    var fractions = [1/25,1/50,1/100,1/250,1/500,1/1000]
+    var fractions = [1/100,1/250,1/500,1/1000]
     for (var frac_i = 0; frac_i < fractions.length; frac_i++) {
       fraction = fractions[frac_i]
-      console.log(fraction)
       // Keep looping as long as pushing tiles apart is possible
       var pushable = true
       var push_loops = 0
@@ -397,8 +397,9 @@ function arrange(tile_objs) {
     }
 
     // Snap tiles to edges
+    var proximity = snap_i/max_loops
     for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
-      edge_snap(arranged[tile_i])
+      edge_snap(arranged[tile_i],proximity)
     }
   }
 
