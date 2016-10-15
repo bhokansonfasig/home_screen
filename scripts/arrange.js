@@ -339,8 +339,11 @@ function arrange(tile_objs) {
 
   // Grow the tiles as much as possible, snap them to edges, then repeat
   var max_loops = 25
+  var fraction = 1/1000
   for (var snap_i = 1; snap_i < max_loops+1 ; snap_i++) {
-    var fraction = 1/100000
+    if (snap_i%10===0) {
+      fraction = fraction/10
+    }
     var current_dimensions = []
     for (var i = 0; i < arranged.length; i++) {
       var tile = arranged[i]
@@ -458,9 +461,6 @@ function arrange(tile_objs) {
     }
   )
 
-  // console.log(grow_order)
-  // return
-
   // Fill space by stretching tiles that will allow it
   // Keep looping as long as tile dimensions are changing
   var changing = true
@@ -520,7 +520,11 @@ function arrange(tile_objs) {
     }
   }
 
-  console.log(loops)
+  var area_filled = 0
+  var total_area = window.innerHeight*window.innerWidth
+  for (var i = 0; i < arranged.length; i++) {
+    area_filled += arranged[i].width*arranged[i].height
+  }
 }
 
 
