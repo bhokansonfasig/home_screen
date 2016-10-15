@@ -428,8 +428,8 @@ function arrange(tile_objs) {
         for (var i = 0; i < current_dimensions.length; i++) {
           for (var j = 0; j < 4; j++) {
             if (Math.round(current_dimensions[i][j]*100/fraction)!==Math.round(past_dimensions[i][j]*100/fraction)) {
-                  changing = true
-                  break
+              changing = true
+              break
             }
           }
         }
@@ -457,57 +457,70 @@ function arrange(tile_objs) {
       return a[1]-b[1]
     }
   )
-  console.log(grow_order)
+
+  // console.log(grow_order)
+  // return
 
   // Fill space by stretching tiles that will allow it
-  // Loop through based on percentage of preferred area achieved so far
-  for (var i = 0; i < grow_order.length; i++) {
-    console.log(grow_order[i][0])
-    var tile = arranged[grow_order[i][0]]
-    current_dimensions = [tile.top,tile.left,tile.height,tile.width]
+  // Keep looping as long as tile dimensions are changing
+  var changing = true
+  var loops = 0
+  while (changing) {
+    loops++
+    if (loops>100/fraction) {
+      console.log("Too many later loops")
+      break
+    }
 
-    // Keep looping as long as tile dimensions are changing
-    var changing = true
-    var loops = 0
-    while (changing) {
-      loops++
-      if (loops>1/fraction) {
-        console.log("Too many loops")
-        break
-      }
+    past_dimensions = current_dimensions
+    if (loops%1000===1) {
+      var stored_dimensions = current_dimensions
+      var last_stored = loops
+    }
 
-      var past_dimensions = current_dimensions
-
+    // Loop through based on percentage of preferred area achieved so far
+    for (var i = 0; i < grow_order.length; i++) {
+      var tile = arranged[grow_order[i][0]]
       var directions = ["u","d","l","r"]
 
       // Try to increase each dimension of the tile without overlapping
       grow(tile,fraction,direction=directions[loops%4],oversize=true,keep_ratio=false)
       if (check_outside(tile)!==false) {
-        revert(tile,past_dimensions)
+        revert(tile,past_dimensions[grow_order[i][0]])
       }
       for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
         var other_tile = arranged[tile_i]
         if (check_overlap(tile,other_tile)!==false) {
-          revert(tile,past_dimensions)
+          revert(tile,past_dimensions[grow_order[i][0]])
           break
         }
       }
+    }
 
-      // Check whether anything has (noticably) changed
-      current_dimensions = [tile.top,tile.left,tile.height,tile.width]
-      // Give it a chance to change a bit first
-      if (loops>10) {
-        changing = false
+    // Check whether anything has (noticably) changed
+    current_dimensions = []
+    for (var i = 0; i < arranged.length; i++) {
+      var tile = arranged[i]
+      current_dimensions.push([tile.top,tile.left,tile.height,tile.width])
+    }
+    // Give it a chance to change a bit first
+    if (loops>last_stored+990) {
+      changing = false
+      for (var i = 0; i < current_dimensions.length; i++) {
+        if (changing) {
+          break
+        }
         for (var j = 0; j < 4; j++) {
-          if (Math.round(current_dimensions[j]*100/fraction)!==Math.round(past_dimensions[j]*100/fraction)) {
-                changing = true
-                console.log("Changed",loops)
-                break
+          if (Math.round(current_dimensions[i][j]*100/fraction)!==Math.round(stored_dimensions[i][j]*100/fraction)) {
+            changing = true
+            break
           }
         }
       }
     }
   }
+
+  console.log(loops)
 }
 
 
