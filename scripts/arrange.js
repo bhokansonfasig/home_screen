@@ -243,17 +243,7 @@ function edge_snap(tile,proximity) {
   // Snaps tile to the edges it is closest to
   var temp_tile = {}
 
-  // Check snap to top edge
-  temp_tile.top = 0
-  temp_tile.left = tile.left
-  temp_tile.height = tile.top
-  temp_tile.width = tile.width
-  var closeness = tile.top/window.innerHeight
-  if (edge_close(tile,temp_tile) && closeness<proximity) {
-    tile.top = 0
-  }
-
-  // Check snap to bottom edge
+  // Snap to bottom edge
   temp_tile.top = tile.top+tile.height
   temp_tile.left = tile.left
   temp_tile.height = window.innerHeight - temp_tile.top
@@ -263,7 +253,17 @@ function edge_snap(tile,proximity) {
     tile.top = window.innerHeight - tile.height
   }
 
-  // Check snap to left edge
+  // Snap to right edge
+  temp_tile.top = tile.top
+  temp_tile.left = tile.left+tile.width
+  temp_tile.height = tile.height
+  temp_tile.width = window.innerWidth - temp_tile.left
+  closeness = (window.innerWidth-tile.left-tile.width)/window.innerWidth
+  if (edge_close(tile,temp_tile)  && closeness<proximity) {
+    tile.left = window.innerWidth - tile.width
+  }
+
+  // Snap to left edge
   temp_tile.top = tile.top
   temp_tile.left = 0
   temp_tile.height = tile.height
@@ -273,14 +273,14 @@ function edge_snap(tile,proximity) {
     tile.left = 0
   }
 
-  // Check snap to right edge
-  temp_tile.top = tile.top
-  temp_tile.left = tile.left+tile.width
-  temp_tile.height = tile.height
-  temp_tile.width = window.innerWidth - temp_tile.left
-  closeness = (window.innerWidth-tile.left-tile.width)/window.innerWidth
-  if (edge_close(tile,temp_tile)  && closeness<proximity) {
-    tile.left = window.innerWidth - tile.width
+  // Snap to top edge
+  temp_tile.top = 0
+  temp_tile.left = tile.left
+  temp_tile.height = tile.top
+  temp_tile.width = tile.width
+  var closeness = tile.top/window.innerHeight
+  if (edge_close(tile,temp_tile) && closeness<proximity) {
+    tile.top = 0
   }
 }
 
@@ -339,7 +339,7 @@ function arrange(tile_objs) {
 
   // Grow the tiles as much as possible, snap them to edges, then repeat
   var max_loops = 25
-  var fraction = 1/1000
+  var fraction = 1/100
   for (var snap_i = 1; snap_i < max_loops+1 ; snap_i++) {
     if (snap_i%10===0) {
       fraction = fraction/10
@@ -461,6 +461,9 @@ function arrange(tile_objs) {
     }
   )
 
+  // console.log(grow_order)
+  // return
+
   // Fill space by stretching tiles that will allow it
   // Keep looping as long as tile dimensions are changing
   var changing = true
@@ -482,7 +485,20 @@ function arrange(tile_objs) {
     for (var i = 0; i < grow_order.length; i++) {
       var tile = arranged[grow_order[i][0]]
       var directions = ["u","d","l","r"]
-
+      // if (grow_order[i][0]===1) {
+      //   console.log(loops)
+      //   console.log(window.innerHeight,window.innerWidth)
+      //   console.log(directions[loops%4])
+      //   console.log(tile.left,tile.width)
+      //   console.log(grow(tile,fraction,direction=directions[loops%4],oversize=true,keep_ratio=false))
+      //   console.log(tile.left,tile.width)
+      //   console.log(check_outside(tile))
+      //   for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
+      //     var other_tile = arranged[tile_i]
+      //     console.log(check_overlap(tile,other_tile))
+      //   revert(tile,past_dimensions[grow_order[i][0]])
+      //   }
+      // }
       // Try to increase each dimension of the tile without overlapping
       grow(tile,fraction,direction=directions[loops%4],oversize=true,keep_ratio=false)
       if (check_outside(tile)!==false) {
@@ -531,10 +547,14 @@ function arrange(tile_objs) {
 function setup(id,tile_obj) {
   var tile = document.getElementById(id)
   tile.innerHTML = tile_obj.html
-  tile.style.top = Math.round(tile_obj.top/window.innerHeight*100).toString()+"%"
-  tile.style.left = Math.round(tile_obj.left/window.innerWidth*100).toString()+"%"
-  tile.style.width = Math.round(tile_obj.width/window.innerWidth*100).toString()+"%"
-  tile.style.height = Math.round(tile_obj.height/window.innerHeight*100).toString()+"%"
+  // tile.style.top = Math.round(tile_obj.top/window.innerHeight*100).toString()+"%"
+  // tile.style.left = Math.round(tile_obj.left/window.innerWidth*100).toString()+"%"
+  // tile.style.width = Math.round(tile_obj.width/window.innerWidth*100).toString()+"%"
+  // tile.style.height = Math.round(tile_obj.height/window.innerHeight*100).toString()+"%"
+  tile.style.top = Math.round(tile_obj.top).toString()+"px"
+  tile.style.left = Math.round(tile_obj.left).toString()+"px"
+  tile.style.width = Math.round(tile_obj.width).toString()+"px"
+  tile.style.height = Math.round(tile_obj.height).toString()+"px"
   tile.style.backgroundColor = tile_obj.settings.color
 }
 
