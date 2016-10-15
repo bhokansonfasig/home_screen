@@ -1,6 +1,6 @@
-enabled = 'false'
+enabled = 'true'
 
-size = '{"width":600, "height":300, "force_ratio":false}'
+size = '{"width":500, "height":250, "force_ratio":false}'
 
 region = '"N"'
 
