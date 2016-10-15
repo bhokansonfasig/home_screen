@@ -340,7 +340,7 @@ function arrange(tile_objs) {
   // Grow the tiles as much as possible, snap them to edges, then repeat
   var max_loops = 25
   for (var snap_i = 1; snap_i < max_loops+1 ; snap_i++) {
-    var fraction = 1/10000
+    var fraction = 1/100000
     var current_dimensions = []
     for (var i = 0; i < arranged.length; i++) {
       var tile = arranged[i]
@@ -423,7 +423,7 @@ function arrange(tile_objs) {
         current_dimensions.push([tile.top,tile.left,tile.height,tile.width])
       }
       // Give it a chance to change a bit first
-      if (loops>10) {
+      if (loops>.01/fraction) {
         changing = false
         for (var i = 0; i < current_dimensions.length; i++) {
           for (var j = 0; j < 4; j++) {
@@ -467,13 +467,13 @@ function arrange(tile_objs) {
   var loops = 0
   while (changing) {
     loops++
-    if (loops>100/fraction) {
+    if (loops>10/fraction) {
       console.log("Too many later loops")
       break
     }
 
     past_dimensions = current_dimensions
-    if (loops%1000===1) {
+    if (loops%Math.floor(.1/fraction)===1) {
       var stored_dimensions = current_dimensions
       var last_stored = loops
     }
@@ -504,7 +504,7 @@ function arrange(tile_objs) {
       current_dimensions.push([tile.top,tile.left,tile.height,tile.width])
     }
     // Give it a chance to change a bit first
-    if (loops>last_stored+990) {
+    if (loops>last_stored+Math.floor(.1/fraction)-10) {
       changing = false
       for (var i = 0; i < current_dimensions.length; i++) {
         if (changing) {
