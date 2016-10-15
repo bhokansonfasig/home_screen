@@ -485,28 +485,15 @@ function arrange(tile_objs) {
     for (var i = 0; i < grow_order.length; i++) {
       var tile = arranged[grow_order[i][0]]
       var directions = ["u","d","l","r"]
-      // if (grow_order[i][0]===1) {
-      //   console.log(loops)
-      //   console.log(window.innerHeight,window.innerWidth)
-      //   console.log(directions[loops%4])
-      //   console.log(tile.left,tile.width)
-      //   console.log(grow(tile,fraction,direction=directions[loops%4],oversize=true,keep_ratio=false))
-      //   console.log(tile.left,tile.width)
-      //   console.log(check_outside(tile))
-      //   for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
-      //     var other_tile = arranged[tile_i]
-      //     console.log(check_overlap(tile,other_tile))
-      //   revert(tile,past_dimensions[grow_order[i][0]])
-      //   }
-      // }
+      var expand_dir = directions[loops%4]
       // Try to increase each dimension of the tile without overlapping
-      grow(tile,fraction,direction=directions[loops%4],oversize=true,keep_ratio=false)
-      if (check_outside(tile)!==false) {
+      grow(tile,fraction,direction=expand_dir,oversize=true,keep_ratio=false)
+      if (check_outside(tile)!==false && check_outside(tile).includes(expand_dir)) {
         revert(tile,past_dimensions[grow_order[i][0]])
       }
       for (var tile_i = 0; tile_i < arranged.length; tile_i++) {
         var other_tile = arranged[tile_i]
-        if (check_overlap(tile,other_tile)!==false) {
+        if (check_overlap(tile,other_tile)!==false && check_overlap(tile,other_tile).includes(expand_dir)) {
           revert(tile,past_dimensions[grow_order[i][0]])
           break
         }
