@@ -365,13 +365,20 @@ function arrange(tile_objs) {
         var tile = arranged[tile_i]
         grow(tile,fraction)
         var outside_sides = check_outside(tile)
+        // If the tile grew outside the window...
         if (outside_sides!==false) {
+          // Try pushing it inward
           if (!push_in(tile,fraction,outside_sides)) {
+            // If that causes problems, undo it
             push_in(tile,-fraction,outside_sides)
-            if (outside_sides.length===2) {
-              grow(tile,-fraction,outside_sides)
+            // Shrink down sides respecting aspect ratio
+            if (outside_sides.length!==2) {
+              grow(tile,-fraction)
             }
-            else if (tile.settings.size.force_ratio) {
+            else if ((outside_sides.includes("u") &&
+                      outside_sides.includes("d")) ||
+                     (outside_sides.includes("l") &&
+                      outside_sides.includes("r"))) {
               grow(tile,-fraction)
             }
             else {
@@ -450,11 +457,12 @@ function arrange(tile_objs) {
       return a[1]-b[1]
     }
   )
-
+  console.log(grow_order)
 
   // Fill space by stretching tiles that will allow it
   // Loop through based on percentage of preferred area achieved so far
   for (var i = 0; i < grow_order.length; i++) {
+    console.log(grow_order[i][0])
     var tile = arranged[grow_order[i][0]]
     current_dimensions = [tile.top,tile.left,tile.height,tile.width]
 
@@ -473,7 +481,7 @@ function arrange(tile_objs) {
       var directions = ["u","d","l","r"]
 
       // Try to increase each dimension of the tile without overlapping
-      grow(tile,fraction,direction=directions[loops%4],oversize=true)
+      grow(tile,fraction,direction=directions[loops%4],oversize=true,keep_ratio=false)
       if (check_outside(tile)!==false) {
         revert(tile,past_dimensions)
       }
@@ -493,6 +501,7 @@ function arrange(tile_objs) {
         for (var j = 0; j < 4; j++) {
           if (Math.round(current_dimensions[j]*100/fraction)!==Math.round(past_dimensions[j]*100/fraction)) {
                 changing = true
+                console.log("Changed",loops)
                 break
           }
         }
