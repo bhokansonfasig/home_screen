@@ -7,8 +7,11 @@ weather.settings.size = JSON.parse(size)
 weather.settings.region = JSON.parse(region)
 weather.settings.color = JSON.parse(color)
 
-weather.html =
-"<h1> Weather </h1>"
+
+weather.update_interval = 3600000
+weather.update = function(tile) {
+  tile.html = "<h1> Weather </h1>"
+}
 
 
 tiles.weather = weather

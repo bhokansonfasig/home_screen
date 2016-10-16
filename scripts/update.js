@@ -7,26 +7,18 @@
 // }
 
 
-// Update all tiles
-for (var key in tiles) {
-  var tile = tiles[key]
-  if (tile===tiles.datetime) {
-    tile.update(tile)
-  }
-}
-
 // Set regular update interval for each tile
-for (var key in tiles) {
-  var tile = tiles[key]
-  if (tile===tiles.datetime) {
-    window.setInterval(tile.update,tile.update_interval,tile)
-  }
+for (var i = 0; i < enabled.length; i++) {
+  var tile = enabled[i]
+  window.setInterval(tile.update,tile.update_interval,tile)
 }
 
 
 function window_update() {
-  document.getElementById("tile1").innerHTML = tiles.datetime.html
-  console.log("Updated window")
+  for (var i = 0; i < enabled.length; i++) {
+    var tile = enabled[i]
+    tile.element.innerHTML = tile.html
+  }
 }
 
 // Update window every second

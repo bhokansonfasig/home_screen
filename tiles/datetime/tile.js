@@ -8,7 +8,7 @@ datetime.settings.region = JSON.parse(region)
 datetime.settings.color = JSON.parse(color)
 
 
-datetime.update_interval = 1000
+datetime.update_interval = 30000
 datetime.update = function(tile) {
   var dt = new Date()
   var day = dt.getDay()
@@ -33,8 +33,6 @@ datetime.update = function(tile) {
   '<p style="font-size:25px"> '+day+"<br>"+month+" "+dt.getDate()+" </p>"+
   '<p style="font-size:40px"> '+hour.toString()+":"+dt.getMinutes()+" "+ampm+" </p>"
 }
-
-datetime.html = "<p> datetime </p>"
 
 
 tiles.datetime = datetime

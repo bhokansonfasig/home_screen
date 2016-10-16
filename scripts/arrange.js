@@ -1,7 +1,8 @@
 console.log(window.innerWidth)
 console.log(window.innerHeight)
 
-var arranged = []
+
+arranged = []
 
 function check_overlap(tile1,tile2) {
   // Checks if tile1 and tile2 are overlapping
@@ -528,12 +529,15 @@ function arrange(tile_objs) {
   for (var i = 0; i < arranged.length; i++) {
     area_filled += arranged[i].width*arranged[i].height
   }
+
+  return arranged
 }
 
 
 function setup(id,tile_obj) {
+  // Set the tile in div with id
   var tile = document.getElementById(id)
-  tile.innerHTML = tile_obj.html
+  tile_obj.element = tile
   // tile.style.top = Math.round(tile_obj.top/window.innerHeight*100).toString()+"%"
   // tile.style.left = Math.round(tile_obj.left/window.innerWidth*100).toString()+"%"
   // tile.style.width = Math.round(tile_obj.width/window.innerWidth*100).toString()+"%"
@@ -543,31 +547,34 @@ function setup(id,tile_obj) {
   tile.style.width = Math.round(tile_obj.width).toString()+"px"
   tile.style.height = Math.round(tile_obj.height).toString()+"px"
   tile.style.backgroundColor = tile_obj.settings.color
+  tile_obj.update(tile_obj)
 }
 
 
-function hide(id) {
-  var tile = document.getElementById(id)
-  tile.style.visibility = "hidden"
-}
+// function hide(id) {
+//   var tile = document.getElementById(id)
+//   tile.style.visibility = "hidden"
+// }
 
 
-var enabled = []
+enabled = []
+var tile_count = 0
+var body = document.querySelector('body')
 for (var key in tiles) {
   // Only use enabled tiles
   if (tiles[key].settings.enabled) {
     enabled.push(tiles[key])
+    tile_id = "tile"+tile_count.toString()
+    body.innerHTML += '<div class="tile" id='+tile_id+'>'+
+                      // '<p> Tile '+tile_count+'</p></div>'
+                      '</div>'
   }
+  tile_count++
 }
 
-arrange(enabled)
+enabled = arrange(enabled)
 
-for (var i = 0; i < 10; i++) {
-  id = "tile"+(i+1).toString()
-  if (i<arranged.length) {
-    setup(id,arranged[i])
-  }
-  else {
-    hide(id)
-  }
+for (var i = 0; i < enabled.length; i++) {
+  id = "tile"+i.toString()
+  setup(id,enabled[i])
 }
