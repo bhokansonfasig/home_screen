@@ -1,13 +1,20 @@
-html, body { width: 100%;
-             height: 100%;
-             background-color: #AAA}
-div.tile { position: fixed;
-      border: 3px solid #AAA;
-      -webkit-box-sixing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #FFF }
+html, body {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #AAA
+}
+
+div.tile {
+  position: fixed;
+  border: 3px solid #AAA;
+  -webkit-box-sixing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  background-color: #FFF
+}

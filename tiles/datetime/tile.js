@@ -37,8 +37,8 @@ datetime.update = function(tile) {
     minute = minute.toString()
   }
   tile.html =
-  '<p style="font-size:25px"> '+day+"<br>"+month+" "+dt.getDate()+" </p>"+
-  '<p style="font-size:40px"> '+hour.toString()+":"+minute+" "+ampm+" </p>"
+  '<div class="datetime" id="date">'+day+"<br>"+month+" "+dt.getDate()+"</div>"+
+  '<div class="datetime" id="time">'+hour.toString()+":"+minute+" "+ampm+"</div>"
 }
 
 
