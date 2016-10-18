@@ -1,0 +1,20 @@
+div.datetime {
+  position: absolute;
+  text-align: center;
+}
+
+#date {
+  font-size: 3.5vmin;
+  top: 15%;
+  left: 0%;
+  height: 25%;
+  width: 100%;
+}
+
+#time {
+  font-size: 5.5vmin;
+  top: 55%;
+  left: 0%;
+  height: 25%;
+  width: 100%;
+}

@@ -1,0 +1,44 @@
+div.calendar {
+  position: absolute;
+  text-align: center;
+}
+
+#month {
+  font-size: 3.5vmin;
+  font-weight: bold;
+  top: 7%;
+  left: 0%;
+  height: 10%;
+  width: 100%;
+}
+
+div.cal_column {
+  position: absolute;
+  text-align: center;
+  font-size: 2.5vmin;
+  top: 20%;
+  height: 75%;
+  width: 12%;
+  line-height: 4vh;
+}
+
+#cal_col_0 { left: 8% }
+#cal_col_1 { left: 20% }
+#cal_col_2 { left: 32% }
+#cal_col_3 { left: 44% }
+#cal_col_4 { left: 56% }
+#cal_col_5 { left: 68% }
+#cal_col_6 { left: 80% }
+
+
+span.day {
+  font-weight: bold;
+}
+
+span.other_month {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+span.today {
+  background-color: rgba(255, 0, 0, 0.5);
+}
