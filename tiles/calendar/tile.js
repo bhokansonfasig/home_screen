@@ -52,13 +52,4 @@ calendar.update = function(tile) {
 }
 
 
-// calendar.html = '<div class="calendar" id="month"></div>'+
-// '<div class="cal_column" id="cal_col_0"></div>'+
-// '<div class="cal_column" id="cal_col_1"></div>'+
-// '<div class="cal_column" id="cal_col_2"></div>'+
-// '<div class="cal_column" id="cal_col_3"></div>'+
-// '<div class="cal_column" id="cal_col_4"></div>'+
-// '<div class="cal_column" id="cal_col_5"></div>'+
-// '<div class="cal_column" id="cal_col_6"></div>'
-
 tiles.calendar = calendar

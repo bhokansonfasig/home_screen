@@ -5,7 +5,7 @@ div.calendar {
 
 #month {
   font-size: 3.5vmin;
-  font-weight: bold;
+  font-weight: bolder;
   top: 7%;
   left: 0%;
   height: 10%;
@@ -40,5 +40,5 @@ span.other_month {
 }
 
 span.today {
-  background-color: rgba(255, 0, 0, 0.5);
+  background-color: rgba(255, 0, 0, 0.6);
 }
