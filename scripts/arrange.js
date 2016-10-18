@@ -538,14 +538,14 @@ function setup(id,tile_obj) {
   // Set the tile in div with id
   var tile = document.getElementById(id)
   tile_obj.element = tile
-  // tile.style.top = Math.round(tile_obj.top/window.innerHeight*100).toString()+"%"
-  // tile.style.left = Math.round(tile_obj.left/window.innerWidth*100).toString()+"%"
-  // tile.style.width = Math.round(tile_obj.width/window.innerWidth*100).toString()+"%"
-  // tile.style.height = Math.round(tile_obj.height/window.innerHeight*100).toString()+"%"
-  tile.style.top = Math.round(tile_obj.top).toString()+"px"
-  tile.style.left = Math.round(tile_obj.left).toString()+"px"
-  tile.style.width = Math.round(tile_obj.width).toString()+"px"
-  tile.style.height = Math.round(tile_obj.height).toString()+"px"
+  tile.style.top = (Math.round(tile_obj.top/window.innerHeight*100000)/1000).toString()+"%"
+  tile.style.left = (Math.round(tile_obj.left/window.innerWidth*100000)/1000).toString()+"%"
+  tile.style.width = (Math.round(tile_obj.width/window.innerWidth*100000)/1000).toString()+"%"
+  tile.style.height = (Math.round(tile_obj.height/window.innerHeight*100000)/1000).toString()+"%"
+  // tile.style.top = Math.round(tile_obj.top).toString()+"px"
+  // tile.style.left = Math.round(tile_obj.left).toString()+"px"
+  // tile.style.width = Math.round(tile_obj.width).toString()+"px"
+  // tile.style.height = Math.round(tile_obj.height).toString()+"px"
   tile.style.backgroundColor = tile_obj.settings.color
   tile_obj.update(tile_obj)
 }
