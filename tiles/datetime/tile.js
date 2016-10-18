@@ -29,9 +29,16 @@ datetime.update = function(tile) {
     ampm = "pm"
     hour = hour - 12
   }
+  var minute = dt.getMinutes()
+  if (minute<10) {
+    minute = "0"+minute.toString()
+  }
+  else {
+    minute = minute.toString()
+  }
   tile.html =
   '<p style="font-size:25px"> '+day+"<br>"+month+" "+dt.getDate()+" </p>"+
-  '<p style="font-size:40px"> '+hour.toString()+":"+dt.getMinutes()+" "+ampm+" </p>"
+  '<p style="font-size:40px"> '+hour.toString()+":"+minute+" "+ampm+" </p>"
 }
 
 
