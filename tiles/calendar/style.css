@@ -6,7 +6,7 @@ div.calendar {
 #month {
   font-size: 3.5vmin;
   font-weight: bolder;
-  top: 7%;
+  top: 5%;
   left: 0%;
   height: 10%;
   width: 100%;
@@ -16,7 +16,7 @@ div.cal_column {
   position: absolute;
   text-align: center;
   font-size: 2.5vmin;
-  top: 20%;
+  top: 15%;
   height: 75%;
   width: 12%;
   line-height: 4vh;
@@ -32,7 +32,9 @@ div.cal_column {
 
 
 span.day {
-  font-weight: bold;
+  position: relative;
+  top: 1.5vmin;
+  /*font-weight: bold;*/
 }
 
 span.other_month {

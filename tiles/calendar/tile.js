@@ -32,18 +32,18 @@ calendar.update = function(tile) {
 
   for (var j = 0; j < 7; j++) {
     var id = "cal_col_"+j.toString()
-    tile.html += '<div class="cal_column" id='+id+'><span class="day">'+days[j]+'</span>'
+    tile.html += '<div class="cal_column" id='+id+'><span class="day">'+days[j]+'</span><hr color="black">'
     for (var i = start_date+j; i < stop_date; i+=7) {
       var dt = new Date()
       dt.setDate(i)
       if (dt.getMonth()!==current_month) {
-        tile.html += '<br><span class="other_month">'+dt.getDate()+'</span>'
+        tile.html += '<span class="other_month">'+dt.getDate()+'</span><br>'
       }
       else if (dt.getMonth()===current_month && dt.getDate()==current_date) {
-        tile.html += '<br><span class="today">'+dt.getDate()+'</span>'
+        tile.html += '<span class="today">'+dt.getDate()+'</span><br>'
       }
       else {
-        tile.html += '<br>'+dt.getDate()
+        tile.html += dt.getDate()+'<br>'
       }
     }
     tile.html += '</div>'
