@@ -10,7 +10,7 @@ today.settings.color = JSON.parse(color)
 
 today.update_interval = 3600000
 today.update = function(tile) {
-  tile.html = "<h1> Today </h1>"
+  tile.element.innerHTML = "<h1> Today </h1>"
 }
 
 

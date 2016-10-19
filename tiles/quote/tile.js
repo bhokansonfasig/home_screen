@@ -10,7 +10,7 @@ quote.settings.color = JSON.parse(color)
 
 quote.update_interval = 3600000
 quote.update = function(tile) {
-  tile.html = "<h1> Quote </h1>"
+  tile.element.innerHTML = "<h1> Quote </h1>"
 }
 
 
