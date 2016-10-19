@@ -1,3 +1,5 @@
+/*Rename this file to api.json*/
+
 key = '"YOUR_DARK_SKY_API_KEY"'
 
 latitude = '"YOUR_LATITUDE"'
