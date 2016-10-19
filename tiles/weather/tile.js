@@ -14,6 +14,7 @@ weather.api.longitude = JSON.parse(longitude)
 
 
 weather.update_interval = 600000
+// weather.update_interval = 5000
 weather.update = function(tile) {
   var xmlHttp = new XMLHttpRequest()
   xmlHttp.onreadystatechange = function() {
@@ -30,20 +31,28 @@ weather.update = function(tile) {
 
 
 function parseDSresponse(response,tile) {
-  tile.html = '<div class="weather" id="current_temp">'+
-              Math.round(response.currently.temperature).toString()+'°</div>'
+  tile.element.innerHTML = '<div class="weather" id="current_temp">'+
+               Math.round(response.currently.temperature).toString()+'°</div>'
 
-  tile.html += '<div class="weather" id="today_high">'+'High: '+
+  tile.element.innerHTML += '<div class="weather" id="today_high">'+'High: '+
                Math.round(response.daily.data[0].temperatureMax).toString()+'°'+
                '</div><div class="weather" id="today_low">'+'Low: '+
                Math.round(response.daily.data[0].temperatureMin).toString()+'°'+
                '</div>'
 
-  tile.html += '<div class="weather" id="today_summary">'+
+  tile.element.innerHTML += '<div class="weather" id="today_summary">'+
                response.hourly.summary+'</div>'
 
-  tile.html += '<div class="weather" id="DScredit"><a href="https://darksky.net/poweredby/">Powered by Dark Sky</a></footer>'
-  // console.log(tile.html)
+  tile.element.innerHTML += '<div class="weather" id="DScredit"><a href="https://darksky.net/poweredby/">Powered by Dark Sky</a></footer>'
+
+  var size = 4*Math.round(tile.height/10)
+  console.log(size)
+  tile.element.innerHTML += '<canvas id="current_condition_icon" width="'+
+                           size+'" height="'+size+'"></canvas>'
+
+   var skycons = new Skycons()
+   skycons.add("current_condition_icon",response.currently.icon)
+   skycons.play()
 }
 
 tiles.weather = weather

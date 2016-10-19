@@ -23,6 +23,12 @@ div.weather {
   text-align: center;
 }
 
+#current_condition_icon {
+  position: absolute;
+  top: 0%;
+  left: 5%;
+}
+
 #today_high {
   top: 9%;
   left: 50%;
