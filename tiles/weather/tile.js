@@ -16,10 +16,16 @@ weather.api.longitude = JSON.parse(longitude)
 weather.update_interval = 600000
 // weather.update_interval = 5000
 weather.update = function(tile) {
+  tile.element.innerHTML = '<div class="weather" id="weather_error">'+
+                           'Gathering weather information...</div>'
   var xmlHttp = new XMLHttpRequest()
   xmlHttp.onreadystatechange = function() {
-      if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-          parseDSresponse(JSON.parse(xmlHttp.responseText),tile)
+    if (xmlHttp.readyState===4 && xmlHttp.status===200)
+      parseDSresponse(JSON.parse(xmlHttp.responseText),tile)
+    else if (xmlHttp.readyState===4) {
+      tile.element.innerHTML = '<div class="weather" id="weather_error">'+
+                               'Error getting weather; darksky.net may be down</div>'
+    }
   }
   var key = weather.api.key
   var lat = weather.api.latitude
@@ -34,18 +40,18 @@ function parseDSresponse(response,tile) {
   tile.element.innerHTML = '<div class="weather" id="current_temp">'+
                Math.round(response.currently.temperature).toString()+'°</div>'
 
-  tile.element.innerHTML += '<div class="weather" id="today_high">'+'High: '+
-               Math.round(response.daily.data[0].temperatureMax).toString()+'°'+
-               '</div><div class="weather" id="today_low">'+'Low: '+
+  tile.element.innerHTML += '<div class="weather" id="today_high_low">'+'High: '+
+               Math.round(response.daily.data[0].temperatureMax).toString()+
+               '°<br>Low: '+
                Math.round(response.daily.data[0].temperatureMin).toString()+'°'+
                '</div>'
 
   tile.element.innerHTML += '<div class="weather" id="today_summary">'+
-               response.hourly.summary+'</div>'
+               '<span vertical-align=middle>'+response.hourly.summary+'</span></div>'
 
   tile.element.innerHTML += '<div class="weather" id="DScredit"><a href="https://darksky.net/poweredby/">Powered by Dark Sky</a></footer>'
 
-  var size = 4*Math.round(tile.height/10)
+  var size = Math.round(tile.height/2.5)
   console.log(size)
   tile.element.innerHTML += '<canvas id="current_condition_icon" width="'+
                            size+'" height="'+size+'"></canvas>'
