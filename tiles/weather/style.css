@@ -14,14 +14,20 @@ div.weather {
 
 
 #DScredit {
-  top: 90%;
+  top: 94%;
   left: 75%;
-  height: 10%;
+  height: 6%;
   width: 24%;
   font-size: 1.5vmin;
   text-align: right;
 }
 
+
+#current_condition_icon {
+  position: absolute;
+  top: -2%;
+  left: 5%;
+}
 
 #current_temp {
   top: 0%;
@@ -33,12 +39,6 @@ div.weather {
   display: flex;
   justify-content: center; /* align horizontal */
   align-items: center; /* align vertical */
-}
-
-#current_condition_icon {
-  position: absolute;
-  top: 0%;
-  left: 5%;
 }
 
 #today_high_low {
@@ -63,4 +63,40 @@ div.weather {
   display: flex;
   justify-content: center; /* align horizontal */
   align-items: center; /* align vertical */
+}
+
+
+div.forecast {
+  position: absolute;
+  top: 50%;
+  width: 13%;
+  height: 45%;
+}
+
+#forecast_day {
+  top: 5%;
+  left: 5%;
+  height: 20%;
+  width: 90%;
+  position: absolute;
+  text-align: center;
+  font-size: 2vmin;
+  line-height: 1vmin;
+}
+
+#forecast_high_low {
+  top: 80%;
+  left: 5%;
+  height: 20%;
+  width: 90%;
+  position: absolute;
+  text-align: center;
+  font-size: 2vmin;
+  line-height: 1vmin;
+}
+
+canvas.forecast {
+  position: absolute;
+  top: 30%;
+  left: 25%;
 }

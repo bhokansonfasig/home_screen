@@ -37,28 +37,60 @@ weather.update = function(tile) {
 
 
 function parseDSresponse(response,tile) {
-  tile.element.innerHTML = '<div class="weather" id="current_temp">'+
-               Math.round(response.currently.temperature).toString()+'°</div>'
+  var size = Math.round(tile.height/10)
+  tile.element.innerHTML = '<canvas id="current_condition_icon" width="'+
+    4*size+'" height="'+4*size+'"></canvas>'
+
+  tile.element.innerHTML += '<div class="weather" id="current_temp">'+
+    Math.round(response.currently.temperature).toString()+'°</div>'
 
   tile.element.innerHTML += '<div class="weather" id="today_high_low">'+'High: '+
-               Math.round(response.daily.data[0].temperatureMax).toString()+
-               '°<br>Low: '+
-               Math.round(response.daily.data[0].temperatureMin).toString()+'°'+
-               '</div>'
+    Math.round(response.daily.data[0].temperatureMax).toString()+
+    '°<br>Low: '+
+    Math.round(response.daily.data[0].temperatureMin).toString()+'°'+
+    '</div>'
 
-  tile.element.innerHTML += '<div class="weather" id="today_summary">'+
-               '<span vertical-align=middle>'+response.hourly.summary+'</span></div>'
+  // Show weather alerts if there are any, otherwise today summary
+  try {
+    tile.element.innerHTML += '<div class="weather" id="today_summary">'+
+      '<span vertical-align=middle color=red>'+response.alerts[0].title+
+      '</span></div>'
+  } catch (e) {
+    tile.element.innerHTML += '<div class="weather" id="today_summary">'+
+      '<span vertical-align=middle>'+response.hourly.summary+'</span></div>'
+  }
 
-  tile.element.innerHTML += '<div class="weather" id="DScredit"><a href="https://darksky.net/poweredby/">Powered by Dark Sky</a></footer>'
+  var dt = new Date()
+  var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+  today = dt.getDate()
+  for (var i = 1; i < 8; i++) {
+    var day_html = '<div class="forecast" style="left:'+
+                   (4.5+(i-1)*13).toString()+'%">'
+    dt.setDate(today+i)
+    day_html += '<div id="forecast_day">'+days[dt.getDay()]+
+                '<hr color="black"></div>'
+    day_html += '<canvas class="forecast" id="day'+i.toString()+
+                '" width="'+1.5*size+'" height="'+1.5*size+'"></canvas>'
+    day_html += '<div id="forecast_high_low">'+
+                Math.round(response.daily.data[i].temperatureMax).toString()+
+                '° / '+
+                Math.round(response.daily.data[i].temperatureMin).toString()+'°'+
+                '</div>'
 
-  var size = Math.round(tile.height/2.5)
-  console.log(size)
-  tile.element.innerHTML += '<canvas id="current_condition_icon" width="'+
-                           size+'" height="'+size+'"></canvas>'
+    day_html += '</div>'
+    tile.element.innerHTML += day_html
+  }
 
-   var skycons = new Skycons()
-   skycons.add("current_condition_icon",response.currently.icon)
-   skycons.play()
+  tile.element.innerHTML += '<div class="weather" id="DScredit">'+
+    '<a href="https://darksky.net/poweredby/">Powered by Dark Sky</a></footer>'
+
+  var skycons = new Skycons()
+  skycons.add("current_condition_icon",response.currently.icon)
+  for (var i = 1; i < 8; i++) {
+    skycons.add("day"+i.toString(),response.daily.data[i].icon)
+  }
+
+  skycons.play()
 }
 
 tiles.weather = weather
