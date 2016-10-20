@@ -42,5 +42,6 @@ span.other_month {
 }
 
 span.today {
-  background-color: rgba(255, 0, 0, 0.6);
+  /*background-image: url("images/circle-outline.png");*/
+  /*background-color: rgba(255, 0, 0, 0.6);*/
 }
