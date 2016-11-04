@@ -568,8 +568,8 @@ for (var key in tiles) {
     body.innerHTML += '<div class="tile" id='+tile_id+'>'+
                       // '<p> Tile '+tile_count+'</p></div>'
                       '</div>'
+    tile_count++
   }
-  tile_count++
 }
 
 enabled = arrange(enabled)

@@ -2,3 +2,83 @@ div.busses {
   position: absolute;
   text-align: center;
 }
+
+#busses_error {
+  top: 30%;
+  left: 30%;
+  height: 40%;
+  width: 40%;
+  font-size: 3vmin;
+}
+
+
+div.bus_schedule {
+  position: absolute;
+  left: 0%;
+  width: 100%;
+  height: 10%;
+}
+
+div.schedule_desc {
+  position: absolute;
+  top: 0%;
+  left: 5%;
+  height: 100%;
+  width: 40%;
+  font-size: 2vmin;
+  display: flex;
+  justify-content: center; /* align horizontal */
+  align-items: center; /* align vertical */
+}
+
+div.schedule_depart {
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  height: 100%;
+  width: 20%;
+  font-size: 3vmin;
+  display: flex;
+  justify-content: center; /* align horizontal */
+  align-items: center; /* align vertical */
+}
+
+div.schedule_arrive {
+  position: absolute;
+  top: 0%;
+  left: 75%;
+  height: 100%;
+  width: 20%;
+  font-size: 3vmin;
+  display: flex;
+  justify-content: center; /* align horizontal */
+  align-items: center; /* align vertical */
+}
+
+
+#title_bus {
+  top: 2%;
+  left: 5%;
+  width: 40%;
+  height: 10%;
+  font-size: 2vmin;
+  line-height: 1vmin;
+}
+
+#title_depart {
+  top: 2%;
+  left: 50%;
+  width: 20%;
+  height: 10%;
+  font-size: 2vmin;
+  line-height: 1vmin;
+}
+
+#title_arrive {
+  top: 2%;
+  left: 75%;
+  width: 20%;
+  height: 10%;
+  font-size: 2vmin;
+  line-height: 1vmin;
+}

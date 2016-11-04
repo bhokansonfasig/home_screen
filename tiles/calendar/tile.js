@@ -21,6 +21,7 @@ calendar.update = function(tile) {
       break
     }
   }
+  dt.setMonth(current_month)
   dt.setDate(i-1)
   var stop_date = i+6-dt.getDay()
 
