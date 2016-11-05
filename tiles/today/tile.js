@@ -35,6 +35,7 @@ function parseCALresponse(response,cal_name) {
   today.calendars.push([cal_name,events])
   if (today.calendars.length===Object.keys(today.calendar_links).length) {
     console.log("Finished parsing all calendars")
+    console.log(today.calendars)
   }
 }
 
