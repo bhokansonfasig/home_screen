@@ -1,6 +1,6 @@
 /*Rename this file to calendars.json*/
 
-calendar_links = [
-  "https://YOUR_CALENDAR_1_LINK_HERE",
-  "https://YOUR_CALENDAR_2_LINK_HERE"
-]
+calendar_links = '{
+  "CALENDAR_1_NAME": "https://YOUR_CALENDAR_1_LINK_HERE",
+  "CALENDAR_2_NAME": "https://YOUR_CALENDAR_2_LINK_HERE"
+}'
