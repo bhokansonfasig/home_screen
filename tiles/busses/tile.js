@@ -100,6 +100,7 @@ function parseGMresponse(response,tile,destination,dest_length) {
     }
   }
   else {
+    console.log(response.status)
     // slot.innerHTML = "<p>Error: "+response.status+"</p>"
   }
 
@@ -148,13 +149,17 @@ function set_routes_HTML(tile) {
         busses.routes[i][j].transit_details.departure_time.value])
     }
   }
-  // console.log(depart_times)
   depart_times.sort(
     function(a,b) {
       return a[2]-b[2]
     }
   )
+  // console.log(depart_times)
+  // console.log(busses.routes)
   for (var i = 0; i < tile.settings.num_slots; i++) {
+    if (i===depart_times.length) {
+      break
+    }
     var slot = document.getElementById('bus_slot_'+i)
     var dest = busses.routes[depart_times[i][0]][0]
     var dirs = busses.routes[depart_times[i][0]][depart_times[i][1]]
