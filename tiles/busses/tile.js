@@ -14,7 +14,7 @@ busses.api.places = JSON.parse(places)
 busses.routes = []
 
 
-busses.update_interval = 3600000
+busses.update_interval = 100000
 busses.update = function(tile) {
   tile.element.innerHTML = '<div class="busses" id="busses_error">'+
                            'Gathering transit information...</div>'
@@ -61,7 +61,7 @@ function request_bus_info(tile,destination,dest_length) {
 
 
 function parseGMresponse(response,tile,destination,dest_length) {
-  console.log(response)
+  // console.log(response)
 
   if (!tile.element.innerHTML.includes("bus_slot_0")) {
     set_HTML_base(tile)
