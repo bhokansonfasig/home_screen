@@ -36,12 +36,141 @@ today.update = function(tile) {
 
 
 function parseCALresponse(tile,response,cal_name) {
-  var events = parse_ical(response)
+  var events = parse_ical(response,cal_name)
   tile.calendars.push([cal_name,events])
   if (tile.calendars.length===Object.keys(tile.calendar_links).length) {
     console.log("Finished parsing all calendars")
     console.log(tile.calendars)
+    var today_events = []
+    for (var i = 0; i < tile.calendars.length; i++) {
+      var events = get_today_events(tile.calendars[i][1])
+      for (var j = 0; j < events.length; j++) {
+        today_events.push(events[j])
+      }
+    }
+    console.log(today_events)
   }
+}
+
+
+function get_today_events(events) {
+  var today = new Date()
+  var today_events = []
+  for (var i = 0; i < events.length; i++) {
+    if (events[i].repeat===undefined) {
+      if (events[i].start.toDateString()===today.toDateString() ||
+          events[i].end.toDateString()===today.toDateString()) {
+        today_events.push(events[i])
+      }
+    }
+    else {
+      if (events[i].repeat.end>today ||
+          events[i].repeat.end.toDateString()===today.toDateString()) {
+        var repeated_events = expand_repeated_event(events[i])
+        for (var j = 0; j < repeated_events.length; j++) {
+          if (repeated_events[j].start.toDateString()===today.toDateString() ||
+              repeated_events[j].end.toDateString()===today.toDateString()) {
+            today_events.push(repeated_events[j])
+          }
+        }
+      }
+    }
+  }
+  return today_events
+}
+
+
+function expand_repeated_event(base_event) {
+  var events = []
+  var check_date = {"start": new Date(base_event.start.getTime()),
+                    "end": new Date(base_event.end.getTime())}
+  if (base_event.repeat.interval===undefined) {
+    var interval = 1
+  }
+  else {
+    var interval = base_event.repeat.interval
+  }
+  var interval_count = 0
+  while (check_date.start<base_event.repeat.end) {
+    new_event = {}
+    for (var property in base_event) {
+      if (property!=="repeat") {
+        new_event[property] = base_event[property]
+      }
+    }
+    new_event.start = new Date(check_date.start.getTime())
+    new_event.end = new Date(check_date.end.getTime())
+    if (base_event.repeat.freq==="DAILY") {
+      interval_count = add_event(new_event,events,interval,interval_count)
+    }
+    else if (base_event.repeat.freq==="WEEKLY") {
+      if (base_event.repeat.days===undefined) {
+        if (base_event.start.getDay()===check_date.start.getDay()) {
+          interval_count = add_event(new_event,events,interval,interval_count)
+        }
+      }
+      else {
+        var days = eval_repeat_days(base_event.repeat.days)
+        if (days.indexOf(check_date.start.getDay())>-1) {
+          interval_count = add_event(new_event,events,interval,interval_count)
+        }
+      }
+    }
+    else if (base_event.repeat.freq==="MONTHLY") {
+      if (base_event.repeat.days===undefined &&
+          base_event.repeat.monthdays===undefined) {
+        if (base_event.start.getDate()===check_date.start.getDate()) {
+          interval_count = add_event(new_event,events,interval,interval_count)
+        }
+      }
+      else if (base_event.repeat.days===undefined) {
+        if (base_event.repeat.monthdays.indexOf(check_date.start.getDate())>-1) {
+          interval_count = add_event(new_event,events,interval,interval_count)
+        }
+      }
+      else {
+        console.log("Event's repetition not yet supported",base_event)
+      }
+    }
+    else if (base_event.repeat.freq==="YEARLY") {
+      if (base_event.repeat.days===undefined &&
+          base_event.repeat.months===undefined) {
+        if (base_event.start.getMonth()===check_date.start.getMonth()) {
+          interval_count = add_event(new_event,events,interval,interval_count)
+        }
+      }
+      else if (base_event.repeat.days===undefined) {
+        if (base_event.repeat.months.indexOf(check_date.start.getMonth())>-1) {
+          interval_count = add_event(new_event,events,interval,interval_count)
+        }
+      }
+      else {
+        console.log("Event's repetition not yet supported",base_event)
+      }
+    }
+
+    check_date.start.setDate(check_date.start.getDate()+1)
+    check_date.end.setDate(check_date.end.getDate()+1)
+  }
+  return events
+}
+
+
+function add_event(new_event,events,interval,counter) {
+  if (counter%interval===0) {
+    events.push(new_event)
+  }
+  return counter+1
+}
+
+
+function eval_repeat_days(days_as_strings_in_array) {
+  var days = []
+  var string_days = ["SU","MO","TU","WE","TH","FR","SA"]
+  for (var i = 0; i < days_as_strings_in_array.length; i++) {
+    days.push(string_days.indexOf(days_as_strings_in_array[i]))
+  }
+  return days
 }
 
 

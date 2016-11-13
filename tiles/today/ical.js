@@ -1,4 +1,4 @@
-function parse_ical(dump) {
+function parse_ical(dump,cal_name) {
   // console.log(dump)
   var data = dump.split("\n")
   var new_event = undefined
@@ -13,6 +13,7 @@ function parse_ical(dump) {
       new_event = undefined
     }
     if (new_event!==undefined) {
+      new_event.calendar = cal_name
       if (data[i].includes("SUMMARY")) {
         new_event.summary = data[i].slice(8,data[i].length-1)
       }
@@ -58,6 +59,15 @@ function extract_repeat(repeat_rule) {
   }
   if (repeat_rule.includes("BYDAY")) {
     repeat.days = grab_attribute(repeat_rule,"BYDAY").split(",")
+  }
+  if (repeat_rule.includes("BYMONTHDAY")) {
+    repeat.monthdays = grab_attribute(repeat_rule,"BYMONTHDAY").split(",")
+  }
+  if (repeat_rule.includes("BYMONTH=")) {
+    repeat.months = grab_attribute(repeat_rule,"BYMONTH").split(",")
+  }
+  if (repeat_rule.includes("BYSETPOS")) {
+    repeat.setpos = Number(grab_attribute(repeat_rule,"BYSETPOS"))
   }
   if (repeat_rule.includes("UNTIL")) {
     repeat.end = extract_dt(grab_attribute(repeat_rule,"UNTIL"))
