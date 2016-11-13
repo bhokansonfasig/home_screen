@@ -51,6 +51,7 @@ function parseCALresponse(tile,response,cal_name) {
     var today_events = []
     for (var i = 0; i < tile.calendars.length; i++) {
       var events = get_today_events(tile.calendars[i][1])
+      console.log(events)
       for (var j = 0; j < events.length; j++) {
         today_events.push(events[j])
       }
@@ -82,7 +83,9 @@ function get_today_events(events) {
         }
       }
     }
+
   }
+
   return today_events
 }
 
@@ -183,6 +186,8 @@ function eval_repeat_days(days_as_strings_in_array) {
 
 
 function display_events(tile,events) {
+  event_element_height = 14
+
   events.sort(
     function(a,b) {
       return a.start.getTime()-b.start.getTime()
@@ -190,25 +195,89 @@ function display_events(tile,events) {
   )
   // console.log(events)
   tile.element.innerHTML =
-      '<div class="today" id="today_title">'+"Today's Events"+'</div>'
+      '<div class="today" id="today_title">'+"Today"+'</div>'
 
-  for (var i = 0; i < events.length; i++) {
-    top_pos = 8+i*10
-    tile.element.innerHTML +=
-      '<div class="event" id="cal_event_'+i+'"'+
-      ' style="top:'+top_pos+'%"> </div>'
+  overflow_events = events.length-Math.floor((100-16)/event_element_height)
+
+  if (overflow_events>0) {
+    var now = new Date()
+    future_events = []
+    for (var i = 0; i < events.length; i++) {
+      if (events[i].end > now) {
+        future_events.push(events[i])
+      }
+    }
+    if (future_events.length>0) {
+      events = future_events
+    }
   }
 
-  for (var i = 0; i < events.length; i++) {
+  overflow_events = events.length-Math.floor((100-16)/event_element_height)
+
+  if (overflow_events>0) {
+    num_events_displayed = events.length - overflow_events
+  }
+  else {
+    num_events_displayed = events.length
+  }
+
+  for (var i = 0; i < num_events_displayed; i++) {
+    top_pos = 8+i*event_element_height
+    tile.element.innerHTML +=
+      '<div class="event" id="cal_event_'+i+'"'+
+      ' style="top:'+top_pos+'%"></div>'
+  }
+
+  for (var i = 0; i < num_events_displayed; i++) {
     set_event_HTML(tile,events[i],i)
+  }
+
+  if (overflow_events>0) {
+    tile.element.innerHTML += '<div class="today" id="today_overflow">'+
+                              overflow_events+' more events later in the day'+
+                              '</div>'
   }
 }
 
 
 function set_event_HTML(tile,cal_event,index) {
   var slot = document.getElementById('cal_event_'+index)
-  console.log(slot)
-  slot.innerHTML += cal_event.summary
+  if (cal_event.summary.length<17) {
+    slot.innerHTML = '<div class="event_name">'+cal_event.summary+'</div>'
+  }
+  else {
+    slot.innerHTML = '<div class="event_name" style="font-size:'+
+                     45/cal_event.summary.length+
+                     'vw">'+cal_event.summary+'</div>'
+  }
+  slot.innerHTML += '<div class="event_location">'+cal_event.location+'</div>'
+  slot.innerHTML += '<div class="event_times">'+
+                    stringify_time(cal_event.start)+" - "+
+                    stringify_time(cal_event.end)+"</div>"
+}
+
+
+function stringify_time(datetime) {
+  var hour = datetime.getHours()
+  var minute = datetime.getMinutes()
+  var ampm = "am"
+  if (hour==0) {
+    hour = 12
+  }
+  else if (hour==12) {
+    ampm = "pm"
+  }
+  else if (hour>12) {
+    ampm = "pm"
+    hour = hour - 12
+  }
+  if (minute<10) {
+    minute = "0"+minute.toString()
+  }
+  else {
+    minute = minute.toString()
+  }
+  return hour.toString()+":"+minute+ampm
 }
 
 
