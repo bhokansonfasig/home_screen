@@ -8,11 +8,13 @@ today.settings.region = JSON.parse(region)
 today.settings.color = JSON.parse(color)
 
 today.calendar_links = JSON.parse(calendar_links)
+today.total_calendars = Object.keys(today.calendar_links).length
 today.calendars = []
 
 today.update_interval = 3600000
 today.update = function(tile) {
-  tile.element.innerHTML = "<h1> Today </h1>"
+  tile.element.innerHTML = '<div class="today" id="today_error">'+
+                           'Gathering event information...</div>'
 
   tile.calendars = []
   var xmlHttp = {}
@@ -24,7 +26,12 @@ today.update = function(tile) {
           parseCALresponse(tile,xmlHttp[cal_name].responseText,cal_name)
         }
         else if (xmlHttp[cal_name].readyState===4) {
-          console.log('Error getting calendar info')
+          console.log("Error getting info from calendar "+cal_name)
+          tile.total_calendars = tile.total_calendars - 1
+          if (tile.total_calendars===0) {
+            tile.innerHTML = '<div class="today" id="today_error">'+
+                             'Error getting event info</div>'
+          }
         }
       }
       var url = today.calendar_links[cal_name]
@@ -38,7 +45,7 @@ today.update = function(tile) {
 function parseCALresponse(tile,response,cal_name) {
   var events = parse_ical(response,cal_name)
   tile.calendars.push([cal_name,events])
-  if (tile.calendars.length===Object.keys(tile.calendar_links).length) {
+  if (tile.calendars.length===tile.total_calendars) {
     console.log("Finished parsing all calendars")
     console.log(tile.calendars)
     var today_events = []
@@ -48,7 +55,7 @@ function parseCALresponse(tile,response,cal_name) {
         today_events.push(events[j])
       }
     }
-    console.log(today_events)
+    display_events(tile,today_events)
   }
 }
 
@@ -171,6 +178,37 @@ function eval_repeat_days(days_as_strings_in_array) {
     days.push(string_days.indexOf(days_as_strings_in_array[i]))
   }
   return days
+}
+
+
+
+function display_events(tile,events) {
+  events.sort(
+    function(a,b) {
+      return a.start.getTime()-b.start.getTime()
+    }
+  )
+  // console.log(events)
+  tile.element.innerHTML =
+      '<div class="today" id="today_title">'+"Today's Events"+'</div>'
+
+  for (var i = 0; i < events.length; i++) {
+    top_pos = 8+i*10
+    tile.element.innerHTML +=
+      '<div class="event" id="cal_event_'+i+'"'+
+      ' style="top:'+top_pos+'%"> </div>'
+  }
+
+  for (var i = 0; i < events.length; i++) {
+    set_event_HTML(tile,events[i],i)
+  }
+}
+
+
+function set_event_HTML(tile,cal_event,index) {
+  var slot = document.getElementById('cal_event_'+index)
+  console.log(slot)
+  slot.innerHTML += cal_event.summary
 }
 
 
