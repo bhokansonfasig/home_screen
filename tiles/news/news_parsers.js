@@ -33,7 +33,6 @@ function parse_general_feed(dump) {
 
 
 function parse_reddit_feed(dump) {
-  console.log("REDDIT")
   var get_tags = {"title": "title", "link": "content", "time": "updated"}
   var stories = pull_xml_story_objects(dump,"entry",get_tags)
 
@@ -57,11 +56,6 @@ function parse_bbc_feed(dump) {
   var get_tags = {"title": "title", "link": "link", "time": "pubDate",
                   "desc": "description"}
   var stories = pull_xml_story_objects(dump,"item",get_tags)
-
-  // for (var i = 0; i < stories.length; i++) {
-  //   title_str = stories[i].title
-  //   stories[i].title = title_str.slice(9,title_str.length-3)
-  // }
 
   return stories
 }

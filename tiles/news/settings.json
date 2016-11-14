@@ -8,3 +8,5 @@ color = '"#FAF"'
 
 
 news_sources = '{"/r/news": "https://www.reddit.com/r/news/.rss", "BBC": "http://feeds.bbci.co.uk/news/rss.xml#"}'
+
+news_columns = '2'
