@@ -10,3 +10,13 @@ div.news {
   width: 40%;
   font-size: 3vmin;
 }
+
+
+#news_title {
+  top: 0%;
+  left: 10%;
+  height: 10%;
+  width: 80%;
+  font-size: 3vmin;
+  font-weight: bold;
+}

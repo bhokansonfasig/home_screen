@@ -52,17 +52,22 @@ function parseFEEDresponse(tile,response,source) {
     tile.sources.push([source,parse_bbc_feed(response)])
   }
   else {
-    console.log("Not sure how to pull news stories from "+url)
-    tile.total_sources = tile.total_sources - 1
-    if (tile.total_sources===0) {
-      tile.element.innerHTML = '<div class="news" id="news_error">'+
-                               'Error getting news; sources may be down</div>'
+    parsed = parse_general_feed(response)
+    if (parsed.length===0 || parsed[0].title===undefined) {
+      console.log("Not sure how to pull news stories from "+url)
+      tile.total_sources = tile.total_sources - 1
+      if (tile.total_sources===0) {
+        tile.element.innerHTML = '<div class="news" id="news_error">'+
+                                 'Error getting news; sources may be down</div>'
+      }
     }
   }
 
   if (tile.sources.length===tile.total_sources) {
     console.log("Finished gathering news")
     console.log(tile.sources)
+    tile.element.innerHTML = '<div class="news" id="news_title">'+
+                             "Today's news"+'</div>'
   }
 }
 
