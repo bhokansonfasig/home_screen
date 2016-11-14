@@ -46,12 +46,9 @@ function parseCALresponse(tile,response,cal_name) {
   var events = parse_ical(response,cal_name)
   tile.calendars.push([cal_name,events])
   if (tile.calendars.length===tile.total_calendars) {
-    console.log("Finished parsing all calendars")
-    console.log(tile.calendars)
     var today_events = []
     for (var i = 0; i < tile.calendars.length; i++) {
       var events = get_today_events(tile.calendars[i][1])
-      console.log(events)
       for (var j = 0; j < events.length; j++) {
         today_events.push(events[j])
       }
@@ -72,7 +69,7 @@ function get_today_events(events) {
       }
     }
     else {
-      if (events[i].repeat.end>today ||
+      if (events[i].repeat.end===undefined || events[i].repeat.end>today ||
           events[i].repeat.end.toDateString()===today.toDateString()) {
         var repeated_events = expand_repeated_event(events[i])
         for (var j = 0; j < repeated_events.length; j++) {
@@ -91,6 +88,12 @@ function get_today_events(events) {
 
 
 function expand_repeated_event(base_event) {
+  if (base_event.repeat.end===undefined) {
+    console.log("Forcing end to infinitely repeating event",base_event)
+    var forced_stop = new Date()
+    forced_stop.setFullYear(forced_stop.getFullYear()+1)
+    base_event.repeat.end = forced_stop
+  }
   var events = []
   var check_date = {"start": new Date(base_event.start.getTime()),
                     "end": new Date(base_event.end.getTime())}
@@ -196,6 +199,13 @@ function display_events(tile,events) {
   // console.log(events)
   tile.element.innerHTML =
       '<div class="today" id="today_title">'+"Today"+'</div>'
+
+  if (events.length===0) {
+    tile.element.innerHTML +=
+      '<div class="event" id="cal_event_'+i+'"'+
+      ' style="top:15%; text-align:center; font-size:3vmin">'+
+      "No events today!"+'</div>'
+  }
 
   overflow_events = events.length-Math.floor((100-16)/event_element_height)
 
