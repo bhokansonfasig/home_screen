@@ -18,7 +18,7 @@ today.update = function(tile) {
 
   tile.calendars = []
   var xmlHttp = {}
-  for (var cal_name in today.calendar_links) {
+  for (var cal_name in tile.calendar_links) {
     (function(cal_name) {
       xmlHttp[cal_name] = new XMLHttpRequest()
       xmlHttp[cal_name].onreadystatechange = function() {
@@ -34,7 +34,7 @@ today.update = function(tile) {
           }
         }
       }
-      var url = today.calendar_links[cal_name]
+      var url = tile.calendar_links[cal_name]
       xmlHttp[cal_name].open("GET",url,true)
       xmlHttp[cal_name].send(null)
     })(cal_name)
