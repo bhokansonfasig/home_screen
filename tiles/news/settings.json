@@ -5,3 +5,6 @@ size = '{"width":500, "height":500, "force_ratio":false}'
 region = '"C"'
 
 color = '"#FAF"'
+
+
+news_sources = '{"/r/news": "https://www.reddit.com/r/news/.rss", "BBC": "http://feeds.bbci.co.uk/news/rss.xml#"}'

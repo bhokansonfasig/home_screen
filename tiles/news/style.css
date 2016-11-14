@@ -2,3 +2,11 @@ div.news {
   position: absolute;
   text-align: center;
 }
+
+#news_error {
+  top: 30%;
+  left: 30%;
+  height: 40%;
+  width: 40%;
+  font-size: 3vmin;
+}
